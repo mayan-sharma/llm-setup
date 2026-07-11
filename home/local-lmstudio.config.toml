@@ -1,0 +1,5 @@
+# Use with: codex --oss --local-provider lmstudio
+oss_provider = "lmstudio"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+

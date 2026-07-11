@@ -1,0 +1,6 @@
+.bootstrap-backups/
+.checkpoints/
+*.log
+.DS_Store
+Thumbs.db
+

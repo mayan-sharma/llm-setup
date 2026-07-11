@@ -1,0 +1,8 @@
+# Personal cross-project defaults. Keep provider credentials out of this file.
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[features]
+shell_snapshot = true
+
