@@ -1,0 +1,4 @@
+interface:
+  display_name: "Resume Checkpoint"
+  short_description: "Load a saved thread checkpoint"
+  default_prompt: "Use $resume-checkpoint to load a saved checkpoint."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Discussion Loop"
+  short_description: "Research and draft concise GitHub Discussion proposals."
+  default_prompt: "Use $discussion-loop to explore this topic and produce a concise GitHub Discussion draft with implementation pointers."

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Stale Branch Loop"
+  short_description: "Audit stale and unused Git branches"
+  default_prompt: "Use $stale-branch-loop to audit stale branches in this repository and summarize what each branch contains."
+
+policy:
+  allow_implicit_invocation: true

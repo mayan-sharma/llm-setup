@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implementation Loop"
+  short_description: "Research, plan, critique, and implement"
+  default_prompt: "Use $implementation-loop to research, plan, critique, and implement this goal end to end."

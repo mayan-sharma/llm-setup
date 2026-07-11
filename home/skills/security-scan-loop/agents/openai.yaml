@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Scan Loop"
+  short_description: "Run and triage Semgrep and Trivy findings"
+  default_prompt: "Use $security-scan-loop to scan the completed code with Semgrep and Trivy, validate findings, and produce a prioritized report."
