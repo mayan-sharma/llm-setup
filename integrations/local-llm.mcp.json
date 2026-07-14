@@ -1,0 +1,9 @@
+{
+  "name": "local_llm",
+  "command": {
+    "darwin": "python3",
+    "linux": "python3",
+    "win32": "python"
+  },
+  "args": ["{CODEX_HOME}/local-llm/server.py"]
+}

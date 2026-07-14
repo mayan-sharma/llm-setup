@@ -41,6 +41,11 @@ foreach ($tool in @('checkpoint.mjs','local-llm.mjs','route-task.mjs','codex-syn
     Install-TrackedFile (Join-Path $PSScriptRoot $tool) (Join-Path 'bootstrap-tools' $tool)
 }
 
+$integrationArgs = @((Join-Path $PSScriptRoot 'integrate-mcps.mjs'), '--repo', $repo, '--codex-home', $codexHome)
+if ($DryRun) { $integrationArgs += '--dry-run' }
+& node @integrationArgs
+if ($LASTEXITCODE -ne 0) { throw 'MCP integration failed' }
+
 if (-not $DryRun) {
     $metadata = @{ repository = $repo; installed_at = (Get-Date).ToString('o'); version = 1 } | ConvertTo-Json
     $metadataPath = Join-Path $codexHome 'bootstrap-source.json'

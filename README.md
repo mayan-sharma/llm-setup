@@ -12,6 +12,8 @@ The repository installs a small, version-controlled payload into `CODEX_HOME` (n
 - `home/config.toml` — conservative global defaults.
 - `home/*.config.toml` — named CLI profiles.
 - `home/skills/` — reusable checkpoint, sync, local-LLM, and task-routing workflows.
+- `home/local-llm/server.py` — optional dependency-free MCP server for a local OpenAI-compatible model endpoint.
+- `integrations/*.mcp.json` — declarative MCP registrations reconciled automatically by bootstrap and sync.
 - `scripts/` — cross-platform bootstrap, verification, publishing, synchronization, checkpoint, and local tools.
 
 ## What is never versioned
@@ -55,6 +57,8 @@ On another computer, ask:
 
 > Pull my latest personal Codex setup and install it.
 
+Codex will pull the repository, install its payload, and reconcile every checked-in MCP integration—no follow-up shell commands are needed.
+
 Or run:
 
 ```sh
@@ -75,6 +79,12 @@ codex --oss --local-provider lmstudio
 ```
 
 The local providers are optional. Diagnose them with `node scripts/local-llm.mjs doctor`; list routing advice with `node scripts/route-task.mjs "your task"`. Routing only recommends a lane—it never launches work or sends data.
+
+### Optional local-LLM MCP
+
+Bootstrap and sync automatically install and register the complete dependency-free local-LLM MCP server. It does not contact, start, download, or remove a model; an endpoint is needed only when you invoke one of its tools. The server defaults to LM Studio at `http://localhost:1234/v1` and writes only local aggregate usage metadata to `$CODEX_HOME/local-llm/usage.sqlite`. That database, model files, and other runtime state are never versioned.
+
+To add a future MCP, add its portable source to `home/` and one `integrations/<name>.mcp.json` manifest. Bootstrap/sync reconciles that named MCP automatically, without changing unrelated MCP entries.
 
 Create a repository checkpoint with:
 

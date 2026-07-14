@@ -11,6 +11,17 @@ const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(entry => e
 for (const name of ['AGENTS.md', 'README.md', 'home/AGENTS.md', 'home/config.toml']) if (!existsSync(path.join(root, name))) errors.push(`missing required file: ${name}`);
 const files = walk(payload), skills = files.filter(x => x.endsWith(`${path.sep}SKILL.md`)), configs = files.filter(x => x.endsWith('.toml'));
 for (const skill of skills) if (!/^\uFEFF?---\s*\r?\nname:\s*[^\r\n]+\r?\ndescription:\s*[^\r\n]+\r?\n---/.test(readFileSync(skill, 'utf8'))) errors.push(`invalid skill frontmatter: ${path.relative(root, skill)}`);
+const integrations = path.join(root, 'integrations');
+if (existsSync(integrations)) for (const file of readdirSync(integrations).filter(name => name.endsWith('.mcp.json'))) {
+  try {
+    const manifest = JSON.parse(readFileSync(path.join(integrations, file), 'utf8'));
+    if (!/^[a-zA-Z0-9_-]+$/.test(manifest.name || '')) throw new Error('invalid name');
+    if (!manifest.command || typeof manifest.command !== 'object' || Array.isArray(manifest.command) || !Object.values(manifest.command).every(value => typeof value === 'string')) throw new Error('command must map platforms to strings');
+    if (!Array.isArray(manifest.args) || !manifest.args.every(value => typeof value === 'string')) throw new Error('args must be a string array');
+    if (manifest.env && (typeof manifest.env !== 'object' || Array.isArray(manifest.env) || !Object.values(manifest.env).every(value => typeof value === 'string'))) throw new Error('env must map names to strings');
+    if ([...Object.values(manifest.command), ...manifest.args, ...Object.values(manifest.env || {})].some(value => /(?:[A-Z]:\\Users\\|\/(?:Users|home)\/)/.test(value))) throw new Error('contains a machine-specific path');
+  } catch (error) { errors.push(`invalid MCP integration ${path.relative(root, path.join(integrations, file))}: ${error.message}`); }
+}
 const forbidden = /(auth\.json|api[_-]?key\s*=|bearer\s+[a-z0-9])/i;
 for (const file of files) if (forbidden.test(readFileSync(file, 'utf8'))) errors.push(`possible credential or forbidden state reference: ${path.relative(root, file)}`);
 const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), '.codex');

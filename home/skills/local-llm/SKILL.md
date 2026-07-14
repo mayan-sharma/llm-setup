@@ -17,3 +17,7 @@ codex --oss --local-provider lmstudio
 ```
 
 The installed `local-ollama` and `local-lmstudio` profiles set matching defaults, but `--oss` remains explicit. Fall back to the normal Codex provider when local health, tool use, context size, or output quality is insufficient.
+
+## Local MCP server
+
+Bootstrap and sync install and register the dependency-free MCP server at `~/.codex/local-llm/server.py` automatically. It supports low-risk drafting, summaries, and first-pass diff review against an OpenAI-compatible local endpoint. The default endpoint is LM Studio at `http://localhost:1234/v1`; the server is registered even when no endpoint is running, but it does not contact the endpoint until a tool is used. Configure another endpoint with `LOCAL_LLM_BASE_URL`, and pin a model with `LOCAL_LLM_MODEL`. Usage metadata is local-only in `~/.codex/local-llm/usage.sqlite` and must never be committed.

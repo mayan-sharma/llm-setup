@@ -29,6 +29,7 @@ install_file() {
 printf 'CODEX_HOME: %s\n' "$codex_home"
 while IFS= read -r -d '' source; do install_file "$source" "${source#"$payload/"}"; done < <(find "$payload" -type f -print0)
 for tool in checkpoint.mjs local-llm.mjs route-task.mjs codex-sync.mjs; do install_file "$script_dir/$tool" "bootstrap-tools/$tool"; done
+if (( dry_run )); then node "$script_dir/integrate-mcps.mjs" --repo "$repo" --codex-home "$codex_home" --dry-run; else node "$script_dir/integrate-mcps.mjs" --repo "$repo" --codex-home "$codex_home"; fi
 
 if (( ! dry_run )); then
   mkdir -p "$codex_home"
