@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -11,7 +12,7 @@ const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(entry => e
 for (const name of ['AGENTS.md', 'README.md', 'home/AGENTS.md', 'home/config.toml']) if (!existsSync(path.join(root, name))) errors.push(`missing required file: ${name}`);
 const files = walk(payload), skills = files.filter(x => x.endsWith(`${path.sep}SKILL.md`)), configs = files.filter(x => x.endsWith('.toml'));
 for (const skill of skills) if (!/^\uFEFF?---\s*\r?\nname:\s*[^\r\n]+\r?\ndescription:\s*[^\r\n]+\r?\n---/.test(readFileSync(skill, 'utf8'))) errors.push(`invalid skill frontmatter: ${path.relative(root, skill)}`);
-const integrations = path.join(root, 'integrations');
+const integrations = path.join(root, 'integrations'), managedMcps = [];
 if (existsSync(integrations)) for (const file of readdirSync(integrations).filter(name => name.endsWith('.mcp.json'))) {
   try {
     const manifest = JSON.parse(readFileSync(path.join(integrations, file), 'utf8'));
@@ -20,6 +21,7 @@ if (existsSync(integrations)) for (const file of readdirSync(integrations).filte
     if (!Array.isArray(manifest.args) || !manifest.args.every(value => typeof value === 'string')) throw new Error('args must be a string array');
     if (manifest.env && (typeof manifest.env !== 'object' || Array.isArray(manifest.env) || !Object.values(manifest.env).every(value => typeof value === 'string'))) throw new Error('env must map names to strings');
     if ([...Object.values(manifest.command), ...manifest.args, ...Object.values(manifest.env || {})].some(value => /(?:[A-Z]:\\Users\\|\/(?:Users|home)\/)/.test(value))) throw new Error('contains a machine-specific path');
+    managedMcps.push(manifest.name);
   } catch (error) { errors.push(`invalid MCP integration ${path.relative(root, path.join(integrations, file))}: ${error.message}`); }
 }
 const forbidden = /(auth\.json|api[_-]?key\s*=|bearer\s+[a-z0-9])/i;
@@ -28,6 +30,15 @@ const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), '.codex');
 const hash = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 if (existsSync(codexHome)) for (const source of files) { const destination = path.join(codexHome, path.relative(payload, source)); if (!existsSync(destination)) warnings.push(`not installed: ${destination}`); else if (hash(source) !== hash(destination)) warnings.push(`installed drift: ${destination}`); }
 else warnings.push(`CODEX_HOME does not exist yet: ${codexHome}`);
+for (const name of managedMcps) {
+  const result = spawnSync(process.env.CODEX_BIN || 'codex', ['mcp', 'get', name, '--json'], {
+    encoding: 'utf8',
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  if (result.error) { warnings.push(`could not inspect managed MCP ${name}: ${result.error.message}`); break; }
+  if (result.status !== 0) warnings.push(`managed MCP is not registered: ${name}`);
+}
 warnings.forEach(x => console.log(`WARN: ${x}`)); errors.forEach(x => console.log(`ERROR: ${x}`));
 console.log(`Checked ${configs.length} config files and ${skills.length} skills: ${errors.length ? 'FAIL' : 'PASS'}`);
 process.exitCode = errors.length ? 1 : 0;

@@ -19,7 +19,11 @@ function die(message) {
 }
 
 function run(commandArgs, capture = false) {
-  const result = spawnSync(codex, commandArgs, { encoding: 'utf8', stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit' });
+  const result = spawnSync(codex, commandArgs, {
+    encoding: 'utf8',
+    env: { ...process.env, CODEX_HOME: codexHome },
+    stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+  });
   if (result.error) return { ok: false, error: result.error.message, stdout: result.stdout || '', stderr: result.stderr || '' };
   return { ok: result.status === 0, error: result.stderr || '', stdout: result.stdout || '', stderr: result.stderr || '' };
 }

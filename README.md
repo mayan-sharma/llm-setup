@@ -82,7 +82,9 @@ The local providers are optional. Diagnose them with `node scripts/local-llm.mjs
 
 ### Optional local-LLM MCP
 
-Bootstrap and sync automatically install and register the complete dependency-free local-LLM MCP server. It does not contact, start, download, or remove a model; an endpoint is needed only when you invoke one of its tools. The server defaults to LM Studio at `http://localhost:1234/v1` and writes only local aggregate usage metadata to `$CODEX_HOME/local-llm/usage.sqlite`. That database, model files, and other runtime state are never versioned.
+Bootstrap and sync automatically install and register the complete dependency-free local-LLM MCP server. The global policy lets Codex proactively use it for bounded, low-risk drafts, summaries, and first-pass reviews while requiring primary-model verification of material output. Whole-session local-provider selection remains explicit, and sensitive data requires approval for the configured endpoint.
+
+The MCP does not contact, start, download, or remove a model; an endpoint is needed only when one of its tools is invoked. It defaults to LM Studio at `http://localhost:1234/v1` and writes only local aggregate usage metadata to `$CODEX_HOME/local-llm/usage.sqlite`. That database, model files, and other runtime state are never versioned.
 
 To add a future MCP, add its portable source to `home/` and one `integrations/<name>.mcp.json` manifest. Bootstrap/sync reconciles that named MCP automatically, without changing unrelated MCP entries.
 
