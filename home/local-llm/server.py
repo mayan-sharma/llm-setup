@@ -13,6 +13,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from contextlib import closing
 from pathlib import Path
 from typing import Any
 
@@ -45,39 +46,170 @@ def _text_result(text: str) -> dict[str, Any]:
 
 def _init_log_db() -> None:
     LOG_DB.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(str(LOG_DB)) as conn:
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS local_llm_usage (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                created_at INTEGER NOT NULL,
-                tool TEXT NOT NULL,
-                model TEXT,
-                prompt_chars INTEGER NOT NULL,
-                response_chars INTEGER NOT NULL,
-                estimated_tokens INTEGER NOT NULL,
-                elapsed_ms INTEGER NOT NULL
-            )
-            """
-        )
-
-
-def _log_usage(tool: str, model: str, prompt: str, response: str, elapsed_ms: int) -> None:
-    try:
-        _init_log_db()
-        total_chars = len(prompt) + len(response)
-        with sqlite3.connect(str(LOG_DB)) as conn:
+    with closing(sqlite3.connect(str(LOG_DB))) as conn:
+        with conn:
             conn.execute(
                 """
-                INSERT INTO local_llm_usage
-                    (created_at, tool, model, prompt_chars, response_chars, estimated_tokens, elapsed_ms)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (int(time.time()), tool, model, len(prompt), len(response), max(1, total_chars // 4), elapsed_ms),
+                CREATE TABLE IF NOT EXISTS local_llm_usage (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    created_at INTEGER NOT NULL,
+                    tool TEXT NOT NULL,
+                    model TEXT,
+                    prompt_chars INTEGER NOT NULL,
+                    response_chars INTEGER NOT NULL,
+                    estimated_tokens INTEGER NOT NULL,
+                    elapsed_ms INTEGER NOT NULL,
+                    prompt_tokens INTEGER,
+                    completion_tokens INTEGER,
+                    total_tokens INTEGER,
+                    token_source TEXT
+                )
+                """
             )
+
+            # Existing installations predate token-level endpoint telemetry. Keep
+            # this additive so their aggregate history remains usable.
+            columns = {row[1] for row in conn.execute("PRAGMA table_info(local_llm_usage)")}
+            additions = {
+                "prompt_tokens": "INTEGER",
+                "completion_tokens": "INTEGER",
+                "total_tokens": "INTEGER",
+                "token_source": "TEXT",
+            }
+            for name, column_type in additions.items():
+                if name not in columns:
+                    conn.execute(f"ALTER TABLE local_llm_usage ADD COLUMN {name} {column_type}")
+            conn.execute(
+                """
+                UPDATE local_llm_usage
+                SET prompt_tokens = COALESCE(prompt_tokens, MAX(1, prompt_chars / 4)),
+                    completion_tokens = COALESCE(completion_tokens, MAX(1, response_chars / 4)),
+                    total_tokens = COALESCE(total_tokens, estimated_tokens),
+                    token_source = COALESCE(token_source, 'legacy_estimate')
+                WHERE prompt_tokens IS NULL
+                   OR completion_tokens IS NULL
+                   OR total_tokens IS NULL
+                   OR token_source IS NULL
+                """
+            )
+
+
+def _token_counts(prompt: str, response: str, usage: Any) -> tuple[int, int, int, str]:
+    usage = usage if isinstance(usage, dict) else {}
+    raw_prompt = usage.get("prompt_tokens", usage.get("input_tokens"))
+    raw_completion = usage.get("completion_tokens", usage.get("output_tokens"))
+    raw_total = usage.get("total_tokens")
+
+    prompt_tokens = raw_prompt if isinstance(raw_prompt, int) and raw_prompt >= 0 else None
+    completion_tokens = raw_completion if isinstance(raw_completion, int) and raw_completion >= 0 else None
+    total_tokens = raw_total if isinstance(raw_total, int) and raw_total >= 0 else None
+
+    source = "endpoint" if prompt_tokens is not None and completion_tokens is not None else "estimated"
+    if prompt_tokens is None:
+        prompt_tokens = max(1, len(prompt) // 4)
+    if completion_tokens is None:
+        completion_tokens = max(1, len(response) // 4)
+    if total_tokens is None:
+        total_tokens = prompt_tokens + completion_tokens
+    return prompt_tokens, completion_tokens, total_tokens, source
+
+
+def _log_usage(
+    tool: str,
+    model: str,
+    prompt: str,
+    response: str,
+    elapsed_ms: int,
+    usage: Any,
+) -> None:
+    try:
+        _init_log_db()
+        prompt_tokens, completion_tokens, total_tokens, token_source = _token_counts(
+            prompt, response, usage
+        )
+        with closing(sqlite3.connect(str(LOG_DB))) as conn:
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO local_llm_usage
+                        (created_at, tool, model, prompt_chars, response_chars, estimated_tokens,
+                         elapsed_ms, prompt_tokens, completion_tokens, total_tokens, token_source)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        int(time.time()),
+                        tool,
+                        model,
+                        len(prompt),
+                        len(response),
+                        total_tokens,
+                        elapsed_ms,
+                        prompt_tokens,
+                        completion_tokens,
+                        total_tokens,
+                        token_source,
+                    ),
+                )
     except Exception:
         # Logging must never make the tool call fail.
         pass
+
+
+def _usage_summary() -> str:
+    _init_log_db()
+    with closing(sqlite3.connect(str(LOG_DB))) as conn:
+        totals = conn.execute(
+            """
+            SELECT COUNT(*),
+                   COALESCE(SUM(prompt_tokens), 0),
+                   COALESCE(SUM(completion_tokens), 0),
+                   COALESCE(SUM(total_tokens), 0),
+                   COALESCE(SUM(elapsed_ms), 0),
+                   MIN(created_at),
+                   MAX(created_at)
+            FROM local_llm_usage
+            """
+        ).fetchone()
+        by_model = conn.execute(
+            """
+            SELECT COALESCE(model, 'unknown'), COUNT(*), COALESCE(SUM(total_tokens), 0)
+            FROM local_llm_usage
+            GROUP BY model
+            ORDER BY SUM(total_tokens) DESC
+            """
+        ).fetchall()
+        sources = conn.execute(
+            """
+            SELECT token_source, COUNT(*)
+            FROM local_llm_usage
+            GROUP BY token_source
+            ORDER BY token_source
+            """
+        ).fetchall()
+
+    calls, prompt_tokens, completion_tokens, total_tokens, elapsed_ms, first, last = totals
+    model_lines = "\n".join(
+        f"- {model}: {tokens:,} tokens across {count:,} call(s)"
+        for model, count, tokens in by_model
+    ) or "- No local delegations recorded"
+    source_text = ", ".join(f"{source}: {count}" for source, count in sources) or "none"
+    first_text = time.strftime("%Y-%m-%d %H:%M:%S %z", time.localtime(first)) if first else "n/a"
+    last_text = time.strftime("%Y-%m-%d %H:%M:%S %z", time.localtime(last)) if last else "n/a"
+    return (
+        "Local delegation telemetry\n"
+        f"- Calls: {calls:,}\n"
+        f"- Prompt tokens processed locally: {prompt_tokens:,}\n"
+        f"- Completion tokens generated locally: {completion_tokens:,}\n"
+        f"- Total local tokens: {total_tokens:,}\n"
+        f"- Local inference time: {elapsed_ms / 1000:.1f}s\n"
+        f"- First / last: {first_text} / {last_text}\n"
+        f"- Accounting sources: {source_text}\n"
+        "- Gross frontier output offloaded (proxy): "
+        f"{completion_tokens:,} tokens\n"
+        "- Exact net cloud-token savings: unavailable without a cloud-only counterfactual\n"
+        "Models:\n"
+        f"{model_lines}"
+    )
 
 
 def _load_file(path: str) -> str:
@@ -157,7 +289,14 @@ def _chat(
             text = "[local model returned reasoning_content but no final answer; retry with a non-reasoning model or a larger max_tokens budget]"
     except (KeyError, IndexError, TypeError) as exc:
         raise RuntimeError(f"Unexpected local LLM response: {json.dumps(payload)[:1000]}") from exc
-    _log_usage(tool, selected_model, system_prompt + "\n\n" + prompt, text, elapsed_ms)
+    _log_usage(
+        tool,
+        selected_model,
+        system_prompt + "\n\n" + prompt,
+        text,
+        elapsed_ms,
+        payload.get("usage"),
+    )
     return text
 
 
@@ -240,12 +379,19 @@ TOOLS: list[dict[str, Any]] = [
         "description": "List models reported by the local OpenAI-compatible server.",
         "inputSchema": {"type": "object", "properties": {}},
     },
+    {
+        "name": "usage_summary",
+        "description": "Report automatically recorded local delegation token telemetry. Does not call a model.",
+        "inputSchema": {"type": "object", "properties": {}},
+    },
 ]
 
 
 def _call_tool(name: str, args: dict[str, Any]) -> str:
     if name == "list_models":
         return "\n".join(_models(DEFAULT_BASE_URL)) or "No models returned."
+    if name == "usage_summary":
+        return _usage_summary()
     if name == "chat":
         return _chat(
             tool=name,
