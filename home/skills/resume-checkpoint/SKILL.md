@@ -8,7 +8,7 @@ description: Resume or inspect an evidence-grounded repository checkpoint. Use w
 Load the checkpoint with:
 
 ```sh
-node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" show <name-or-latest>
+node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" show <name-or-latest>
 ```
 
 The command compares the saved Git snapshot with the current branch, HEAD, and status.

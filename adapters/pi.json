@@ -1,0 +1,11 @@
+{
+  "name": "pi",
+  "displayName": "pi coding agent",
+  "detect": { "env": ["PI_HOME"], "paths": ["~/.pi"], "bin": ["pi"] },
+  "home": { "env": "PI_HOME", "default": "~/.pi/agent" },
+  "skills": "shared",
+  "instructions": { "file": "AGENTS.md", "mode": "copy" },
+  "extraFiles": [],
+  "mcp": "none",
+  "restartNote": "Restart pi to reload skills and context files."
+}

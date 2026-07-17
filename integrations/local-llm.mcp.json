@@ -5,5 +5,5 @@
     "linux": "python3",
     "win32": "python"
   },
-  "args": ["{CODEX_HOME}/local-llm/server.py"]
+  "args": ["{AGENTS_TOOLS}/local-llm/server.py"]
 }

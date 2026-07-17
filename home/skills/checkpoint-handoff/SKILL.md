@@ -8,7 +8,7 @@ description: Compatibility workflow for creating a durable repository checkpoint
 Create one checkpoint with the installed helper:
 
 ```sh
-node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" create \
+node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" create \
   --objective "requested outcome" \
   --completed "verified work, or not verified" \
   --verification "observed result, or not run" \

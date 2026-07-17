@@ -8,7 +8,7 @@ description: List saved repository checkpoints. Use when the user invokes $list-
 From the target repository, run:
 
 ```sh
-node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" list
+node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" list
 ```
 
 Return the compact output: name, creation time, and next action. Do not open every checkpoint, dump JSON, or summarize their contents unless the user asks to inspect one.

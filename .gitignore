@@ -1,5 +1,6 @@
 .bootstrap-backups/
 .checkpoints/
+targets.local.json
 *.log
 .DS_Store
 Thumbs.db

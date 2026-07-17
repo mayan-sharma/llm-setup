@@ -1,0 +1,11 @@
+{
+  "name": "claude",
+  "displayName": "Claude Code",
+  "detect": { "env": ["CLAUDE_CONFIG_DIR"], "paths": ["~/.claude"], "bin": ["claude"] },
+  "home": { "env": "CLAUDE_CONFIG_DIR", "default": "~/.claude" },
+  "skills": "private",
+  "instructions": { "file": "CLAUDE.md", "mode": "import-agents" },
+  "extraFiles": [],
+  "mcp": "claude-cli",
+  "restartNote": "Restart Claude Code to reload skills and instructions."
+}

@@ -20,7 +20,7 @@ Create a checkpoint in one pass. Optimize for accurate resumption, not narrative
 3. Run the installed helper from the repository root:
 
 ```sh
-node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" create \
+node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" create \
   --name "short-name" \
   --objective "requested outcome" \
   --completed "verified work, or not verified" \
@@ -35,7 +35,7 @@ Omit empty optional flags. The helper mechanically captures repository path, bra
 4. Return the checkpoint name/path and this exact resume command:
 
 ```sh
-node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" show <name>
+node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" show <name>
 ```
 
 ## Accuracy rules

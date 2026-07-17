@@ -8,7 +8,7 @@ description: Save an evidence-grounded checkpoint and continue repository work i
 Create one checkpoint in a single pass. Use only facts already established in the conversation; do not inspect diffs, rerun tests, search thread history, or reconstruct missing details. Use `unknown` or `not verified` for uncertainty.
 
 ```sh
-node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" create \
+node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" create \
   --name "short-name" \
   --objective "requested outcome" \
   --completed "verified work, or not verified" \

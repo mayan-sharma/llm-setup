@@ -22,7 +22,12 @@ SERVER_NAME = "local_llm"
 SERVER_VERSION = "0.1.0"
 DEFAULT_BASE_URL = os.environ.get("LOCAL_LLM_BASE_URL", "http://localhost:1234/v1")
 DEFAULT_MODEL = os.environ.get("LOCAL_LLM_MODEL", "")
-LOG_DB = Path(os.environ.get("LOCAL_LLM_LOG_DB", "~/.codex/local-llm/usage.sqlite")).expanduser()
+LOG_DB = Path(
+    os.environ.get(
+        "LOCAL_LLM_LOG_DB",
+        os.path.join(os.environ.get("AGENTS_HOME", "~/.agents"), "local-llm", "usage.sqlite"),
+    )
+).expanduser()
 MAX_FILE_CHARS = int(os.environ.get("LOCAL_LLM_MAX_FILE_CHARS", "120000"))
 MAX_TEXT_CHARS = int(os.environ.get("LOCAL_LLM_MAX_TEXT_CHARS", "120000"))
 

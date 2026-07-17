@@ -1,0 +1,16 @@
+{
+  "name": "codex",
+  "displayName": "OpenAI Codex CLI",
+  "detect": { "env": ["CODEX_HOME"], "paths": ["~/.codex"], "bin": ["codex"] },
+  "home": { "env": "CODEX_HOME", "default": "~/.codex" },
+  "skills": "shared",
+  "instructions": { "file": "AGENTS.md", "mode": "copy" },
+  "extraFiles": [
+    "config.toml",
+    "deep-review.config.toml",
+    "local-ollama.config.toml",
+    "local-lmstudio.config.toml"
+  ],
+  "mcp": "codex-cli",
+  "restartNote": "Restart Codex to reload global instructions, configuration, and skills."
+}
