@@ -12,5 +12,6 @@
     "local-lmstudio.config.toml"
   ],
   "mcp": "codex-cli",
+  "mcpConfigFile": "config.toml",
   "restartNote": "Restart Codex to reload global instructions, configuration, and skills."
 }

@@ -24,13 +24,21 @@ const backupRoot = path.join(REPO_ROOT, '.bootstrap-backups', stamp);
 const hash = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 
 // Install one file, backing up any differing destination first. `label` is the
-// tag printed; `sourceIsText` allows writing generated content instead of copying.
-function installFile(sourcePathOrContent, destination, label, { content = false } = {}) {
+// tag printed; `content:true` writes generated text instead of copying a file;
+// `preserveMcpTail:true` treats an appended `[mcp_servers.*]` section (written by a
+// harness's own MCP CLI into a config file we also manage) as equal, so the installer
+// and the MCP CLI stop fighting over the same file.
+function installFile(sourcePathOrContent, destination, label, { content = false, preserveMcpTail = false } = {}) {
   const relative = label;
   if (existsSync(destination)) {
-    const same = content
-      ? readFileSync(destination, 'utf8') === sourcePathOrContent
-      : hash(sourcePathOrContent) === hash(destination);
+    let same;
+    if (content) same = readFileSync(destination, 'utf8') === sourcePathOrContent;
+    else if (preserveMcpTail) {
+      const src = readFileSync(sourcePathOrContent, 'utf8');
+      const dst = readFileSync(destination, 'utf8');
+      const idx = dst.search(/\r?\n\[mcp_servers/);
+      same = (idx >= 0 ? dst.slice(0, idx) : dst).trimEnd() === src.trimEnd();
+    } else same = hash(sourcePathOrContent) === hash(destination);
     if (same) { console.log(`ok       ${relative}`); return; }
     const backup = path.join(backupRoot, relative.replace(/[:\\/]+/g, '_'));
     console.log(`backup   ${relative}`);
@@ -102,7 +110,8 @@ function installInstructions(adapter, home) {
 function installExtraFiles(adapter, home) {
   for (const rel of adapter.extraFiles || []) {
     const src = path.join(PAYLOAD, rel);
-    if (existsSync(src)) installFile(src, path.join(home, rel), `${adapter.name}:${rel}`);
+    const preserveMcpTail = rel === adapter.mcpConfigFile;
+    if (existsSync(src)) installFile(src, path.join(home, rel), `${adapter.name}:${rel}`, { preserveMcpTail });
     else console.log(`skip     ${adapter.name}:${rel} (missing in payload)`);
   }
 }

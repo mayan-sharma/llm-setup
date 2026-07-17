@@ -48,12 +48,20 @@ function resolve(manifest, home) {
   };
 }
 
-function cli(bin, cliArgs, home, homeEnv, capture = false) {
+function cli(bin, cliArgs, capture = false) {
+  // Let each harness CLI resolve its own config location the way the user's real
+  // sessions do (honoring any env override they already set in process.env).
+  // Forcing e.g. CLAUDE_CONFIG_DIR here would write MCP config to a path Claude
+  // does not read by default.
   const env = { ...process.env };
-  if (homeEnv) env[homeEnv] = home;
-  const result = spawnSync(bin, cliArgs, {
+  // On Windows the harness CLIs are usually .cmd/.ps1 shims that CreateProcess
+  // cannot resolve directly, so run through a shell and quote arguments.
+  const win = process.platform === 'win32';
+  const quote = s => (win && /[\s"&|<>^()]/.test(s) ? `"${String(s).replace(/"/g, '\\"')}"` : s);
+  const result = spawnSync(win ? quote(bin) : bin, cliArgs.map(quote), {
     encoding: 'utf8',
     env,
+    shell: win,
     stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
   });
   // result.error means the binary could not be spawned (e.g. ENOENT: CLI not on PATH).
@@ -75,14 +83,13 @@ export function reconcileAdapter(adapter, { dryRun = false } = {}) {
   if (method === 'none') return logs;
 
   const home = adapterHome(adapter);
-  const homeEnv = adapter.home?.env;
   const bin = process.env[`${adapter.name.toUpperCase()}_BIN`] || adapter.name;
 
   const manifests = loadManifests();
   if (manifests.length) {
     // Probe the CLI once; if it is not installed, skip MCP for this harness rather
     // than failing the whole install (the harness may not be present on this machine).
-    const probe = cli(bin, ['mcp', '--help'], home, homeEnv, true);
+    const probe = cli(bin, ['mcp', '--help'], true);
     if (probe.missing) { logs.push(`skip     mcp (${adapter.name}: ${bin} CLI not found on PATH)`); return logs; }
   }
 
@@ -91,27 +98,27 @@ export function reconcileAdapter(adapter, { dryRun = false } = {}) {
     if (!desired) { logs.push(`skip     mcp:${manifest.name} (${adapter.name}: no ${process.platform} command)`); continue; }
 
     if (method === 'codex-cli') {
-      const got = cli(bin, ['mcp', 'get', desired.name, '--json'], home, homeEnv, true);
+      const got = cli(bin, ['mcp', 'get', desired.name, '--json'], true);
       let current;
       if (got.ok) { try { current = JSON.parse(got.stdout); } catch {} }
       if (current && codexEquivalent(current, desired)) { logs.push(`ok       mcp:${desired.name} (${adapter.name})`); continue; }
       logs.push(`${current ? 'update' : 'install'}   mcp:${desired.name} (${adapter.name})`);
       if (dryRun) continue;
       if (current) {
-        const removed = cli(bin, ['mcp', 'remove', desired.name], home, homeEnv);
+        const removed = cli(bin, ['mcp', 'remove', desired.name]);
         if (!removed.ok) throw new Error(`could not remove MCP ${desired.name} from ${adapter.name}: ${removed.err.trim()}`);
       }
       const envArgs = Object.entries(desired.env).flatMap(([k, v]) => ['--env', `${k}=${v}`]);
-      const added = cli(bin, ['mcp', 'add', desired.name, ...envArgs, '--', desired.command, ...desired.args], home, homeEnv);
+      const added = cli(bin, ['mcp', 'add', desired.name, ...envArgs, '--', desired.command, ...desired.args]);
       if (!added.ok) throw new Error(`could not add MCP ${desired.name} to ${adapter.name}: ${added.err.trim()}`);
     } else if (method === 'claude-cli') {
       // Claude's `mcp get` JSON shape is less stable; reconcile on presence.
-      const got = cli(bin, ['mcp', 'get', desired.name], home, homeEnv, true);
+      const got = cli(bin, ['mcp', 'get', desired.name], true);
       if (got.ok) { logs.push(`ok       mcp:${desired.name} (${adapter.name})`); continue; }
       logs.push(`install   mcp:${desired.name} (${adapter.name})`);
       if (dryRun) continue;
       const envArgs = Object.entries(desired.env).flatMap(([k, v]) => ['--env', `${k}=${v}`]);
-      const added = cli(bin, ['mcp', 'add', desired.name, '--scope', 'user', ...envArgs, '--', desired.command, ...desired.args], home, homeEnv);
+      const added = cli(bin, ['mcp', 'add', desired.name, '--scope', 'user', ...envArgs, '--', desired.command, ...desired.args]);
       if (!added.ok) throw new Error(`could not add MCP ${desired.name} to ${adapter.name}: ${added.err.trim()}`);
     } else {
       logs.push(`skip     mcp:${desired.name} (${adapter.name}: unknown method "${method}")`);
