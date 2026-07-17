@@ -1,4 +1,4 @@
 interface:
   display_name: "List Checkpoints"
-  short_description: "Show saved checkpoint history"
-  default_prompt: "Use $list-checkpoints to show recent saved checkpoints."
+  short_description: "Show repository checkpoint history"
+  default_prompt: "Use $list-checkpoints to show saved checkpoints in this repository."

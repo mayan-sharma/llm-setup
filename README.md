@@ -91,10 +91,11 @@ To add a future MCP, add its portable source to `home/` and one `integrations/<n
 Create a repository checkpoint with:
 
 ```sh
-node scripts/checkpoint.mjs create --note "what remains"
+node scripts/checkpoint.mjs create --objective "requested outcome" --next "single next action"
+node scripts/checkpoint.mjs show latest
 ```
 
-Checkpoint files go into the current repository's ignored `.checkpoints/` directory by default.
+Checkpoint files go into the current repository's ignored `.checkpoints/` directory by default. The helper captures Git state mechanically and keeps conversation-reported context separate so resumed work can detect stale assumptions.
 
 ## Customizing
 

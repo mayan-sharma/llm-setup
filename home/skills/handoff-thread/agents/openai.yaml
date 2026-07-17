@@ -1,4 +1,4 @@
 interface:
   display_name: "Handoff Thread"
-  short_description: "Checkpoint and continue in a new thread"
-  default_prompt: "Use $handoff-thread to checkpoint this work and continue it in a new thread."
+  short_description: "Checkpoint and resume in a fresh thread"
+  default_prompt: "Use $handoff-thread to save an evidence-grounded checkpoint and continue in a new thread."

@@ -1,54 +1,47 @@
 ---
 name: checkpoint
-description: Quickly create or update a compact Codex handoff checkpoint. Use when the user invokes $checkpoint, asks to create a checkpoint, save current thread state, capture progress, persist current context, create a resumable summary, or make a compressed handoff packet for a fresh Codex thread.
+description: Save a fast, evidence-grounded Codex checkpoint for resuming repository work. Use when the user invokes $checkpoint, asks to save current state, capture progress, persist context, create a resumable summary, or make a compact handoff packet.
 ---
 
 # Checkpoint
 
-Default to a fast checkpoint. The goal is a quick fresh-thread handoff, not a full report.
+Create a checkpoint in one pass. Optimize for accurate resumption, not narrative completeness.
 
-## Fast Default
+## Workflow
 
-1. Pick a name from the user argument, or generate `checkpoint-YYYY-MM-DD-HHMMSS`.
-2. Gather only cheap state:
-   - `pwd`
-   - `git branch --show-current`
-   - `git status --short`
-   - current goal/status from conversation context
-   - immediate next step from conversation context
-3. Save with:
+1. Use facts already present in the conversation. Do not reread the repository, inspect diffs, run tests, or reconstruct old decisions.
+2. Record only these context fields:
+   - objective: the user's current requested outcome
+   - completed: changes known to have been made; say `not verified` when uncertain
+   - decision: only an explicit decision that constrains future work
+   - verification: commands and outcomes already observed
+   - blocker: an active blocker or material risk, otherwise omit
+   - next: one executable next action
+3. Run the installed helper from the repository root:
 
-```bash
-python3 ~/.codex/checkpoints/checkpoints.py save
+```sh
+node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" create \
+  --name "short-name" \
+  --objective "requested outcome" \
+  --completed "verified work, or not verified" \
+  --decision "explicit constraint, if any" \
+  --verification "observed command result, or not run" \
+  --blocker "active blocker, if any" \
+  --next "single next action"
 ```
 
-Use JSON on stdin with only these fields:
+Omit empty optional flags. The helper mechanically captures repository path, branch, HEAD, status, changed files, and recent commits. These Git fields are evidence; the context fields are conversation-reported notes.
 
-```json
-{
-  "name": "short-name",
-  "project": "repo-or-project",
-  "cwd": "/absolute/path",
-  "git_branch": "branch",
-  "git_status": "short status",
-  "summary": "1-3 sentence checkpoint summary",
-  "handoff_brief": "under 250 words; enough for a fresh thread to continue",
-  "resume_prompt": "under 120 words; pasteable fresh-thread prompt",
-  "next_step": "single next action"
-}
+4. Return the checkpoint name/path and this exact resume command:
+
+```sh
+node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" show <name>
 ```
 
-4. Final response must be brief: checkpoint name, project, and resume prompt.
+## Accuracy rules
 
-## Deep Checkpoint
-
-Use this only when the user explicitly says `deep`, `full`, `detailed`, `audit`, or asks for a complete packet.
-
-In deep mode, include files, commands, decisions, blockers, and validation. Keep the handoff concise.
-
-## Constraints
-
-- Do not use `local_llm` during fast checkpoint creation.
-- Do not inspect checkpoint schemas, broad diffs, logs, or repo files unless saving fails or the user asks for deep mode.
-- Do not run tests, builds, validation, or cleanup just to create a checkpoint.
-- Do not enumerate every changed file in fast mode unless already obvious from `git status --short`.
+- Never claim a file was changed, command succeeded, or decision was made unless the current conversation proves it.
+- Use `unknown` or `not verified` instead of filling gaps with plausible detail.
+- Do not call local models, subagents, thread-history search, or broad repository tools.
+- Do not include secrets, raw diffs, long command output, speculation, or a general conversation summary.
+- Use a detailed handoff only when the user explicitly requests one; even then, keep facts and inference visibly separate.

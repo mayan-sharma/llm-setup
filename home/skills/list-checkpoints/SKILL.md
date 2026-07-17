@@ -1,27 +1,14 @@
 ---
 name: list-checkpoints
-description: List saved Codex handoff checkpoints. Use when the user invokes $list-checkpoints, asks to list checkpoints, show saved checkpoints, find previous checkpoints, inspect checkpoint history, locate resumable Codex thread states, or find compressed handoff packets.
+description: List saved repository checkpoints. Use when the user invokes $list-checkpoints, asks to show checkpoint history, find a saved checkpoint, locate resumable work, or inspect available handoff packets.
 ---
 
 # List Checkpoints
 
-List recent compact Codex checkpoints.
+From the target repository, run:
 
-Use:
-
-```bash
-python3 ~/.codex/checkpoints/checkpoints.py list
+```sh
+node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" list
 ```
 
-Add `--project <filter>` when the user provides a repo, project, or cwd filter.
-
-Present results compactly with:
-
-- checkpoint id
-- name
-- project
-- updated time
-- goal/status or handoff preview
-- next step
-
-Do not dump raw JSON unless requested.
+Return the compact output: name, creation time, and next action. Do not open every checkpoint, dump JSON, or summarize their contents unless the user asks to inspect one.

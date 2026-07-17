@@ -1,4 +1,4 @@
 interface:
   display_name: "Resume Checkpoint"
-  short_description: "Load a saved thread checkpoint"
-  default_prompt: "Use $resume-checkpoint to load a saved checkpoint."
+  short_description: "Verify and resume saved repository work"
+  default_prompt: "Use $resume-checkpoint to verify and continue from a saved checkpoint."

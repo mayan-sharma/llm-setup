@@ -1,26 +1,24 @@
 ---
 name: checkpoint-handoff
-description: Create a durable local checkpoint or a concise handoff for long, interrupted, or transferred repository work.
+description: Compatibility workflow for creating a durable repository checkpoint or concise handoff. Use when the user explicitly invokes $checkpoint-handoff or asks for the legacy checkpoint-and-handoff workflow.
 ---
 
-# Checkpoint and handoff
+# Checkpoint Handoff
 
-Use this skill when the user asks to checkpoint, pause, resume, or hand off work, or when an explicitly long-running task needs a recovery point.
-
-From the target repository, run the versioned helper installed with this environment:
+Create one checkpoint with the installed helper:
 
 ```sh
-node ~/.codex/bootstrap-tools/checkpoint.mjs create --note "next action"
+node "${CODEX_HOME:-$HOME/.codex}/bootstrap-tools/checkpoint.mjs" create \
+  --objective "requested outcome" \
+  --completed "verified work, or not verified" \
+  --verification "observed result, or not run" \
+  --next "single next action"
 ```
 
-On Windows, use `$env:USERPROFILE\.codex\bootstrap-tools\checkpoint.mjs` when `CODEX_HOME` is not set. The helper records repository path, branch, HEAD, working-tree status, changed files, recent commits, and the note. It does not stage, commit, stash, or modify source files.
+Use only facts already established in the conversation. Do not inspect diffs, rerun tests, reconstruct missing details, create a second summary, or use a separate store. The helper mechanically captures Git evidence.
 
-For a conversational handoff, summarize:
+For a new thread, use:
 
-1. Objective and decisions.
-2. Completed changes with file paths.
-3. Verification performed and results.
-4. Remaining steps in execution order.
-5. Risks, blockers, and uncommitted state.
-
-Do not include secrets or paste full diffs into checkpoint notes.
+```text
+Use $resume-checkpoint <name>. Verify the saved Git snapshot, then continue with the recorded next action.
+```

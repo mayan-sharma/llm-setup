@@ -1,4 +1,4 @@
 interface:
   display_name: "Checkpoint"
-  short_description: "Save current thread state"
-  default_prompt: "Use $checkpoint to save the current thread state."
+  short_description: "Save fast, evidence-grounded work state"
+  default_prompt: "Use $checkpoint to save an accurate, compact repository handoff."
