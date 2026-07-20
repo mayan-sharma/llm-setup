@@ -94,8 +94,7 @@ node scripts/agents.mjs sync
 
 Sync refuses to pull over uncommitted changes, uses `git pull --ff-only`, installs every
 enabled harness, and verifies drift. Publishing rejects likely secrets, private keys,
-symbolic links, and user-specific absolute paths. `push` and `sync` are aliased from the
-legacy `scripts/codex-sync.mjs publish`/`sync` for back-compat.
+symbolic links, and user-specific absolute paths.
 
 ## Portability
 

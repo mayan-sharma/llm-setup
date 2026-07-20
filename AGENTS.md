@@ -16,7 +16,7 @@ Codex CLI, Claude Code, pi, and any future harness — from a single set of file
 - `scripts/install.mjs` (Node, cross-platform) is the real installer. `bootstrap.sh` and
   `bootstrap.ps1` are thin wrappers around it.
 - `scripts/agents.mjs` is the unified CLI (`push`, `sync`, `install`, `targets`,
-  `doctor`, `status`). `scripts/codex-sync.mjs` is a back-compat alias.
+  `doctor`, `status`).
 
 ## Bootstrap request
 

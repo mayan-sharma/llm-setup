@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Unified cross-harness environment CLI: push skills, sync a machine, inspect
-// targets, and lint skills for portability. Supersedes codex-sync.mjs.
+// targets, and lint skills for portability.
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync } from 'node:fs';
 import os from 'node:os';
@@ -72,7 +72,7 @@ function isDetected(adapter) {
   return false;
 }
 
-// --- push (was: codex-sync publish) ---
+// --- push ---
 
 function validateSkill(source) {
   if (!existsSync(source) || !statSync(source).isDirectory()) die(`skill directory not found: ${source}`);
