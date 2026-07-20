@@ -5,7 +5,7 @@ description: Proactively offload eligible low-risk subtasks to the local-LLM MCP
 
 # Local LLM
 
-Proactively use the local MCP for eligible low-risk subtasks under the global policy when doing so will save primary-model context or provide a useful independent first pass. Choosing a local model as the provider for the entire Codex session remains explicit.
+Proactively use the local MCP for eligible low-risk subtasks when doing so will save primary-model context or provide a useful independent first pass — summarizing long files or logs, drafting documentation/tests/boilerplate, and first-pass diff review. No additional permission is needed for non-sensitive MCP calls within the user's task. Keep security-critical, legal, incident-response, architectural, and final-review decisions with the primary model. Choosing a local model as the provider for the entire session remains explicit.
 
 Run `node "${AGENTS_HOME:-$HOME/.agents}/tools/local-llm.mjs" doctor` to check supported local endpoints and list discovered models. Never start, download, or remove a model without the user's permission.
 
