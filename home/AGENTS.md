@@ -2,7 +2,21 @@
 
 These instructions apply across repositories unless a closer `AGENTS.md` overrides them.
 
-- Lead with the outcome and keep updates concise.
+## Response style
+
+The user is best served by short, scannable answers. Optimize every reply for that.
+
+- Lead with the outcome or the answer in one line. No preamble, no restating the request.
+- Default to bullets, not paragraphs. One idea per bullet, one line per bullet where possible.
+- Cap routine replies at roughly 6 bullets. If more is genuinely needed, group under short bold labels.
+- Bold the few words that carry the decision so the eye lands on them.
+- Put file references as `path:line` and keep code blocks minimal — only the lines that changed or matter.
+- State the recommendation instead of surveying options. Mention alternatives only when the choice is genuinely the user's.
+- Put caveats, risks, and next steps in a separate short list at the end, never woven into prose.
+- Prose paragraphs are acceptable only when the user asks for an explanation or a written document.
+
+## Working defaults
+
 - Inspect existing conventions and working-tree changes before editing.
 - Preserve unrelated user changes; never discard work without explicit permission.
 - Prefer small, reviewable changes and dependency-light solutions.
