@@ -243,7 +243,15 @@ def _choose_model(base_url: str, requested: str | None) -> str:
     available = _models(base_url)
     if not available:
         raise ValueError("LM Studio returned no loaded/available models")
-    return available[0]
+    # Embedding models cannot serve /chat/completions at all, so they are never a
+    # valid implicit pick. Beyond that we do not rank models - set LOCAL_LLM_MODEL
+    # or pass `model` to choose deliberately. Sorted because LM Studio's /models
+    # order shifts with load state, which otherwise makes the implicit pick vary
+    # run to run.
+    chattable = sorted(name for name in available if "embed" not in name.lower())
+    if not chattable:
+        raise ValueError(f"No chat-capable model among: {', '.join(available)}")
+    return chattable[0]
 
 
 def _chat(
@@ -264,43 +272,58 @@ def _chat(
     )
     prompt = "/no_think\n" + prompt
     selected_model = _choose_model(base_url, model)
-    body = {
-        "model": selected_model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-    }
-    data = json.dumps(body).encode("utf-8")
-    req = urllib.request.Request(
-        base_url.rstrip("/") + "/chat/completions",
-        data=data,
-        headers={"Content-Type": "application/json", "Accept": "application/json"},
-        method="POST",
-    )
-    start = time.time()
-    try:
-        with urllib.request.urlopen(req, timeout=180) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except urllib.error.URLError as exc:
-        raise RuntimeError(f"Could not reach local LLM at {base_url}: {exc}") from exc
-    elapsed_ms = int((time.time() - start) * 1000)
-    try:
-        message = payload["choices"][0]["message"]
-        text = message.get("content") or ""
-        if not text and message.get("reasoning_content"):
-            text = "[local model returned reasoning_content but no final answer; retry with a non-reasoning model or a larger max_tokens budget]"
-    except (KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError(f"Unexpected local LLM response: {json.dumps(payload)[:1000]}") from exc
+
+    def attempt(budget: int) -> tuple[str, int, dict[str, Any] | None]:
+        body = {
+            "model": selected_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": temperature,
+            "max_tokens": budget,
+        }
+        data = json.dumps(body).encode("utf-8")
+        req = urllib.request.Request(
+            base_url.rstrip("/") + "/chat/completions",
+            data=data,
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+            method="POST",
+        )
+        start = time.time()
+        try:
+            with urllib.request.urlopen(req, timeout=180) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"Could not reach local LLM at {base_url}: {exc}") from exc
+        elapsed_ms = int((time.time() - start) * 1000)
+        try:
+            message = payload["choices"][0]["message"]
+            return message.get("content") or "", elapsed_ms, payload.get("usage")
+        except (KeyError, IndexError, TypeError) as exc:
+            raise RuntimeError(f"Unexpected local LLM response: {json.dumps(payload)[:1000]}") from exc
+
+    # A reasoning model can spend the whole budget on hidden reasoning and return
+    # empty content. Retry once with room to land a final answer, then give up
+    # loudly — an empty result must never reach the caller looking like a summary.
+    text, elapsed_ms, usage = attempt(max_tokens)
+    total_ms = elapsed_ms
+    if not text:
+        text, elapsed_ms, usage = attempt(max_tokens * 2)
+        total_ms += elapsed_ms
+    if not text:
+        raise RuntimeError(
+            f"{selected_model} returned no answer at max_tokens={max_tokens} or "
+            f"{max_tokens * 2}; it likely spent the budget on hidden reasoning. "
+            f"Pass a different `model`, or set LOCAL_LLM_MODEL."
+        )
     _log_usage(
         tool,
         selected_model,
         system_prompt + "\n\n" + prompt,
         text,
-        elapsed_ms,
-        payload.get("usage"),
+        total_ms,
+        usage,
     )
     return text
 
