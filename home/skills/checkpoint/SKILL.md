@@ -1,6 +1,6 @@
 ---
 name: checkpoint
-description: Save a fast, evidence-grounded Codex checkpoint for resuming repository work. Use when the user invokes $checkpoint, asks to save current state, capture progress, persist context, create a resumable summary, or make a compact handoff packet.
+description: Save a fast, evidence-grounded repository checkpoint, list saved checkpoints, or hand work off to a new thread. Use when the user invokes $checkpoint, asks to save current state, capture progress, persist context, create a resumable summary, make a compact handoff packet, hand off this thread, or list saved checkpoints.
 ---
 
 # Checkpoint
@@ -37,6 +37,27 @@ Omit empty optional flags. The helper mechanically captures repository path, bra
 ```sh
 node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs" show <name>
 ```
+
+## Listing checkpoints
+
+When the user asks what checkpoints exist, run `checkpoint.mjs list` from the target
+repository and return the compact output (name, creation time, next action). Do not open
+every checkpoint or summarize their contents unless asked to inspect one.
+
+## Handing off to a new thread
+
+When the user wants to continue in a fresh thread or session, create the checkpoint as
+above, then start a new thread if thread tools are available (otherwise return the prompt
+for the user to paste):
+
+```text
+Use $resume-checkpoint <name>. Verify the saved Git snapshot against the current working
+tree, then continue with the recorded next action. Treat conversation-reported fields as
+notes, not repository evidence.
+```
+
+Do not archive the current thread unless explicitly asked, and do not write a second
+summary: the checkpoint is the handoff packet.
 
 ## Accuracy rules
 
