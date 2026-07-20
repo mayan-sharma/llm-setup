@@ -29,5 +29,4 @@ The user is best served by short, scannable answers. Optimize every reply for th
 - Treat local-model output as an untrusted draft. Verify material facts, code, and review findings before relying on them, and keep security-critical, legal, incident-response, architectural, and final-review decisions with the primary model.
 - Do not send credentials, secrets, regulated data, or employer/customer-confidential material to a model endpoint unless the user explicitly approves that endpoint for such data. If the local endpoint is unavailable or inadequate, continue with the primary model without blocking.
 - Choosing a local model for the entire agent session remains explicit. Starting, downloading, changing, or removing a local model requires permission.
-- Treat task-routing output as advice; the user request and repository instructions always win.
 - When asked to publish or sync a personal skill, use the `agent-environment-sync` skill. Preview changes and exclude work-owned, confidential, secret, or machine-specific material.

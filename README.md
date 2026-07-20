@@ -26,7 +26,7 @@ Clone this repository, open it in your agent (Codex or Claude), and say:
 - `home/AGENTS.md` — global personal instructions (installed as `AGENTS.md` for Codex/pi
   and inlined into `CLAUDE.md` for Claude Code).
 - `home/config.toml`, `home/*.config.toml` — Codex global defaults and named profiles.
-- `home/skills/` — reusable checkpoint, sync, local-LLM, and task-routing workflows.
+- `home/skills/` — reusable checkpoint, sync, and local-LLM workflows.
 - `home/local-llm/server.py` — optional dependency-free local-LLM MCP server.
 - `adapters/*.json` — harness adapters.
 - `integrations/*.mcp.json` — declarative MCP registrations reconciled per harness.
@@ -120,9 +120,7 @@ codex --oss --local-provider ollama
 codex --oss --local-provider lmstudio
 ```
 
-Diagnose local providers with `node scripts/local-llm.mjs doctor`; get routing advice with
-`node scripts/route-task.mjs "your task"`. Routing only recommends a lane — it never
-launches work or sends data.
+Diagnose local providers with `node scripts/local-llm.mjs doctor`.
 
 ### Optional local-LLM MCP
 

@@ -14,7 +14,7 @@ export const ADAPTERS_DIR = path.join(REPO_ROOT, 'adapters');
 
 // Helper tools that install into the shared ~/.agents/tools directory so every
 // harness references them the same way.
-export const SHARED_TOOLS = ['checkpoint.mjs', 'local-llm.mjs', 'route-task.mjs', 'agents.mjs', 'codex-sync.mjs'];
+export const SHARED_TOOLS = ['checkpoint.mjs', 'local-llm.mjs', 'agents.mjs', 'codex-sync.mjs'];
 
 // Expand a leading ~ and normalize to an absolute path.
 export function expandHome(input) {

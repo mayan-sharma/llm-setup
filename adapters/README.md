@@ -15,7 +15,7 @@ receive no private copy. Adapters with `"skills": "private"` also get skills cop
 into their own home (for harnesses that do not read the shared path yet, e.g. Claude
 Code).
 
-Helper tools (`checkpoint.mjs`, `local-llm.mjs`, `route-task.mjs`, `agents.mjs`) always
+Helper tools (`checkpoint.mjs`, `local-llm.mjs`, `agents.mjs`) always
 install to `~/.agents/tools/`, and the optional local-LLM MCP server to
 `~/.agents/tools/local-llm/server.py`, so skills can reference them the same way from
 any harness.
