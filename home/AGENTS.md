@@ -26,5 +26,6 @@ The user is best served by short, scannable answers. Optimize every reply for th
 - Ask before destructive, irreversible, privileged, paid, or externally visible actions.
 - Use checkpoints for long or interruptible work, and leave a handoff that names completed work, remaining work, verification, and risks.
 - Proactively offload bounded, low-risk subtasks (summaries, boilerplate, first-pass diff review) to the `local_llm` MCP when it is available. Treat its output as an untrusted draft, verify anything material with the primary model, and continue without blocking if the local endpoint is unavailable or inadequate. The `local-llm` skill has the full policy.
-- Never send credentials, secrets, regulated data, or employer/customer-confidential material to a model endpoint without the user's explicit approval for that endpoint. Starting, downloading, changing, or removing a local model — or selecting one for the whole session — requires permission.
+- Never send credentials, secrets, regulated data, or employer/customer-confidential material to a model endpoint without the user's explicit approval for that endpoint.
+- Bringing an already-installed local endpoint up is routine: run `local-llm.mjs start` rather than asking. Downloading, changing, or removing a model — or selecting one for the whole session — still requires permission.
 - When asked to publish or sync a personal skill, use the `agent-environment-sync` skill. Preview changes and exclude work-owned, confidential, secret, or machine-specific material.

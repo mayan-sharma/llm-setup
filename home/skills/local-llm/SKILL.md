@@ -1,22 +1,32 @@
 ---
 name: local-llm
-description: Proactively offload eligible low-risk subtasks to the local-LLM MCP, diagnose optional Ollama or LM Studio endpoints, and keep whole-session provider selection explicit.
+description: Proactively offload eligible low-risk subtasks to the local-LLM MCP, start and diagnose the local LM Studio endpoint, and keep whole-session provider selection explicit.
 ---
 
 # Local LLM
 
 Proactively use the local MCP for eligible low-risk subtasks when doing so will save primary-model context or provide a useful independent first pass — summarizing long files or logs, drafting documentation/tests/boilerplate, and first-pass diff review. No additional permission is needed for non-sensitive MCP calls within the user's task. Keep security-critical, legal, incident-response, architectural, and final-review decisions with the primary model. Choosing a local model as the provider for the entire session remains explicit.
 
-Run `node "${AGENTS_HOME:-$HOME/.agents}/tools/local-llm.mjs" doctor` to check supported local endpoints and list discovered models. Never start, download, or remove a model without the user's permission.
+LM Studio at `http://localhost:1234/v1` is the only supported local provider, for both the MCP tools and Codex `--oss`.
 
-Preferred Codex commands:
+## When an MCP call fails
+
+A refused connection means the endpoint is down. Recover without asking:
 
 ```sh
-codex --oss --local-provider ollama
+node "${AGENTS_HOME:-$HOME/.agents}/tools/local-llm.mjs" start    # brings the endpoint up
+node "${AGENTS_HOME:-$HOME/.agents}/tools/local-llm.mjs" doctor   # probes it, lists models
+```
+
+`start` is idempotent and only launches an already-installed LM Studio. If it reports no models downloaded, or no `lms` CLI is present, stop and ask — installing or downloading needs permission.
+
+## Whole-session Codex provider
+
+```sh
 codex --oss --local-provider lmstudio
 ```
 
-The installed `local-ollama` and `local-lmstudio` profiles set matching defaults, but `--oss` remains explicit. Fall back to the normal Codex provider when local health, tool use, context size, or output quality is insufficient. A failed or weak MCP attempt must not block completion of the user's task.
+The installed `local-lmstudio` profile sets matching defaults, but `--oss` remains explicit. Fall back to the normal Codex provider when local health, tool use, context size, or output quality is insufficient. A failed or weak MCP attempt must not block completion of the user's task.
 
 ## Local MCP server
 

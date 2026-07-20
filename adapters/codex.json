@@ -8,7 +8,6 @@
   "extraFiles": [
     "config.toml",
     "deep-review.config.toml",
-    "local-ollama.config.toml",
     "local-lmstudio.config.toml"
   ],
   "mcp": "codex-cli",

@@ -52,11 +52,11 @@ safe — differing destination files are first backed up under
 
 ## Notes
 
-- Codex profiles: `codex --profile deep-review`, `codex --oss --local-provider
-  ollama|lmstudio`.
+- Codex profiles: `codex --profile deep-review`, `codex --oss --local-provider lmstudio`.
 - The optional local-LLM MCP server installs to `~/.agents/tools/local-llm/server.py` and
   registers into every MCP-capable harness; the `local-llm` skill carries the offload
-  policy and configuration. Diagnose endpoints with `node scripts/local-llm.mjs doctor`.
+  policy and configuration. Start the endpoint with `node scripts/local-llm.mjs start`,
+  diagnose it with `doctor`.
 - Checkpoints: `node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs"
   create|show|list`; the `checkpoint` skill carries the workflow.
 - Customize by editing `home/` or `adapters/`, committing, and rerunning bootstrap. Never

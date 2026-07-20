@@ -59,8 +59,8 @@ pushed features become usable automatically.
 - When adding a personal MCP, keep its portable code under `home/` and add
   `integrations/<name>.mcp.json`; use `{AGENTS_TOOLS}` for the server path.
 - When supporting a new harness, add `adapters/<name>.json` only.
-- Keep optional integrations opt-in. A fresh bootstrap must work without Ollama, LM Studio,
-  or any particular harness present.
+- Keep optional integrations opt-in. A fresh bootstrap must work without LM Studio or any
+  particular harness present.
 - Add reusable workflows as `home/skills/<name>/SKILL.md`; keep supporting scripts beside
   the skill. Publishing must validate the whole skill directory and stage nothing unrelated.
 - Before finishing changes, run `node scripts/verify.mjs`, `node scripts/agents.mjs doctor`,
