@@ -1,0 +1,23 @@
+scripts/install.mjs
+  174c612cb1152b33 26-71,74-77,79,83,85-86,94,97-98,160-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "0aab07b1f2528d5a3aabd217f10782a74a91422a",
+  "prompts": {
+    "174c612cb1152b33": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "675edd65-8692-4e86-898a-7d3e00f2b233",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mayan.sharma@1mg.com",
+      "messages": [],
+      "total_additions": 59,
+      "total_deletions": 12,
+      "accepted_lines": 59,
+      "overriden_lines": 0
+    }
+  }
+}
