@@ -23,21 +23,67 @@ const backupRoot = path.join(REPO_ROOT, '.bootstrap-backups', stamp);
 
 const hash = file => createHash('sha256').update(readFileSync(file)).digest('hex');
 
+// A managed TOML config is shared: this repository owns the bare top-level keys the
+// payload declares, while the destination machine owns everything else — `notify`
+// hooks, `[mcp_servers.*]` written by the harness's own MCP CLI, `[projects.*]` trust
+// levels, `[desktop]`, `[marketplaces.*]`. Overwriting the file wholesale would revert
+// all of that on every sync, so merge instead: replace the values we own in place and
+// preserve every other line verbatim.
+//
+// Deliberately line-based rather than a real TOML parse — the repository is Node-only
+// with no dependencies, and the payload is a flat list of scalar defaults. Keys inside
+// the destination's own `[sections]` are left alone; only the leading bare-key region
+// is managed.
+function mergeManagedToml(payloadText, destinationText) {
+  const owned = new Map();
+  for (const line of payloadText.split(/\r?\n/)) {
+    if (/^\s*\[/.test(line)) break;            // payload's own sections are not merged
+    const match = line.match(/^\s*([A-Za-z0-9_-]+)\s*=/);
+    if (match) owned.set(match[1], line);
+  }
+
+  const out = [];
+  const seen = new Set();
+  let inLeadingRegion = true;
+  for (const line of destinationText.split(/\r?\n/)) {
+    if (/^\s*\[/.test(line)) inLeadingRegion = false;
+    if (inLeadingRegion) {
+      const match = line.match(/^\s*([A-Za-z0-9_-]+)\s*=/);
+      if (match && owned.has(match[1])) {
+        out.push(owned.get(match[1]));          // adopt the payload's value
+        seen.add(match[1]);
+        continue;
+      }
+    }
+    out.push(line);
+  }
+
+  // Keys the payload introduced that the destination lacks: insert after the leading
+  // comment block, before any section, so they stay in the managed region.
+  const missing = [...owned.entries()].filter(([key]) => !seen.has(key)).map(([, line]) => line);
+  if (missing.length) {
+    let at = 0;
+    while (at < out.length && (/^\s*#/.test(out[at]) || out[at].trim() === '')) at++;
+    out.splice(at, 0, ...missing);
+  }
+  return `${out.join('\n').replace(/\n+$/, '')}\n`;
+}
+
 // Install one file, backing up any differing destination first. `label` is the
 // tag printed; `content:true` writes generated text instead of copying a file;
-// `preserveMcpTail:true` treats an appended `[mcp_servers.*]` section (written by a
-// harness's own MCP CLI into a config file we also manage) as equal, so the installer
-// and the MCP CLI stop fighting over the same file.
-function installFile(sourcePathOrContent, destination, label, { content = false, preserveMcpTail = false } = {}) {
+// `managedToml:true` merges the payload's owned top-level keys into an existing
+// destination instead of replacing it, so the installer and the harness's own tooling
+// stop fighting over the same file.
+function installFile(sourcePathOrContent, destination, label, { content = false, managedToml = false } = {}) {
   const relative = label;
+  let merged;
   if (existsSync(destination)) {
     let same;
     if (content) same = readFileSync(destination, 'utf8') === sourcePathOrContent;
-    else if (preserveMcpTail) {
-      const src = readFileSync(sourcePathOrContent, 'utf8');
+    else if (managedToml) {
       const dst = readFileSync(destination, 'utf8');
-      const idx = dst.search(/\r?\n\[mcp_servers/);
-      same = (idx >= 0 ? dst.slice(0, idx) : dst).trimEnd() === src.trimEnd();
+      merged = mergeManagedToml(readFileSync(sourcePathOrContent, 'utf8'), dst);
+      same = merged === dst;
     } else same = hash(sourcePathOrContent) === hash(destination);
     if (same) { console.log(`ok       ${relative}`); return; }
     const backup = path.join(backupRoot, relative.replace(/[:\\/]+/g, '_'));
@@ -45,10 +91,11 @@ function installFile(sourcePathOrContent, destination, label, { content = false,
     if (!dryRun) { mkdirSync(path.dirname(backup), { recursive: true }); cpSync(destination, backup); }
     backedUp++;
   }
-  console.log(`install  ${relative}`);
+  console.log(`${merged ? 'merge  ' : 'install'}  ${relative}`);
   if (!dryRun) {
     mkdirSync(path.dirname(destination), { recursive: true });
-    if (content) writeFileSync(destination, sourcePathOrContent, { encoding: 'utf8' });
+    if (merged !== undefined) writeFileSync(destination, merged, { encoding: 'utf8' });
+    else if (content) writeFileSync(destination, sourcePathOrContent, { encoding: 'utf8' });
     else cpSync(sourcePathOrContent, destination);
   }
   changed++;
@@ -110,8 +157,8 @@ function installInstructions(adapter, home) {
 function installExtraFiles(adapter, home) {
   for (const rel of adapter.extraFiles || []) {
     const src = path.join(PAYLOAD, rel);
-    const preserveMcpTail = rel === adapter.mcpConfigFile;
-    if (existsSync(src)) installFile(src, path.join(home, rel), `${adapter.name}:${rel}`, { preserveMcpTail });
+    const managedToml = rel === adapter.mcpConfigFile;
+    if (existsSync(src)) installFile(src, path.join(home, rel), `${adapter.name}:${rel}`, { managedToml });
     else console.log(`skip     ${adapter.name}:${rel} (missing in payload)`);
   }
 }
