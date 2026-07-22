@@ -13,4 +13,4 @@ for arg in "$@"; do
   esac
 done
 
-exec node "$script_dir/install.mjs" "${pass[@]}"
+exec node "$script_dir/install.mjs" "${pass[@]+${pass[@]}}"
