@@ -1,0 +1,23 @@
+home/skills/catalyst-demo-video/SKILL.md
+  95d4c0e3af7b2af0 11-18,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "8b10e960bfba022c967ade5d6c2c8058c2c1c5df",
+  "prompts": {
+    "95d4c0e3af7b2af0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a73eab72-ddb2-413a-b876-c66180448fda",
+        "model": "claude-opus-5"
+      },
+      "human_author": "mayan.sharma@1mg.com",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 4,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    }
+  }
+}
