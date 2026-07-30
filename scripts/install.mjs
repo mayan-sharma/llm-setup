@@ -174,6 +174,19 @@ function installPrivateSkills(adapter, home) {
   }
 }
 
+// Subagent personas. Only harnesses that declare an `agents` directory get them;
+// Codex and pi have no equivalent concept, so their adapters omit the key.
+function installAgents(adapter, home) {
+  if (!adapter.agents) return;
+  const src = path.join(PAYLOAD, 'agents');
+  if (!existsSync(src)) return;
+  const dest = path.join(home, adapter.agents);
+  for (const file of walk(src)) {
+    const rel = path.relative(src, file);
+    installFile(file, path.join(dest, rel), `${adapter.name}:${adapter.agents}/${rel.replaceAll(path.sep, '/')}`);
+  }
+}
+
 function writeMetadata(home) {
   if (dryRun) return;
   const file = path.join(home, 'bootstrap-source.json');
@@ -204,6 +217,7 @@ for (const adapter of targets) {
   installInstructions(adapter, home);
   installExtraFiles(adapter, home);
   installPrivateSkills(adapter, home);
+  installAgents(adapter, home);
   try {
     for (const line of reconcileAdapter(adapter, { dryRun })) console.log(line);
   } catch (error) {

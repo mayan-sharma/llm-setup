@@ -4,6 +4,7 @@
   "detect": { "env": ["CLAUDE_CONFIG_DIR"], "paths": ["~/.claude"], "bin": ["claude"] },
   "home": { "env": "CLAUDE_CONFIG_DIR", "default": "~/.claude" },
   "skills": "private",
+  "agents": "agents",
   "instructions": { "file": "CLAUDE.md", "mode": "import-agents" },
   "extraFiles": [],
   "mcp": "claude-cli",

@@ -29,6 +29,7 @@ any harness.
 | `detect` | How to auto-detect the harness: `env` vars set, `paths` that exist, or `bin` on `PATH`. Any match counts. |
 | `home` | Harness config home: `env` var to honor and `~`-relative `default`. |
 | `skills` | `"shared"` (rely on `~/.agents/skills`) or `"private"` (also copy into `<home>/skills`). |
+| `agents` | Optional. Subdirectory of `<home>` receiving `home/agents/*.md` subagent personas (Claude Code: `agents`). Omit for harnesses with no subagent concept — the payload is skipped. |
 | `instructions` | `file` to write in `<home>`; `mode` is `copy` (verbatim `AGENTS.md`) or `import-agents` (generate a file that imports the canonical `AGENTS.md`). |
 | `extraFiles` | Payload files copied verbatim into `<home>` (e.g. Codex `config.toml` profiles). Paths are relative to `home/`. |
 | `mcp` | MCP registration method: `codex-cli`, `claude-cli`, or `none`. |
