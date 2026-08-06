@@ -1,0 +1,25 @@
+home/agents/peacock.md
+  1a5d7fcaac808b58 1-60
+home/agents/caveman.md
+  1a5d7fcaac808b58 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "c95a70985913e2e6c5f8da40a06cf3212396aa67",
+  "prompts": {
+    "1a5d7fcaac808b58": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7c872542-9525-4a66-b8c4-88565003f8eb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "mayan.sharma@1mg.com",
+      "messages": [],
+      "total_additions": 109,
+      "total_deletions": 0,
+      "accepted_lines": 109,
+      "overriden_lines": 0
+    }
+  }
+}
