@@ -1,0 +1,18 @@
+gauntlet-loop
+
+Vendored verbatim from robonuggets/gauntlet-loop
+https://github.com/robonuggets/gauntlet-loop
+(.claude/skills/gauntlet-loop/SKILL.md, main branch, fetched 2026-08-16)
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).
+The full license text is in LICENSE; see also
+https://creativecommons.org/licenses/by/4.0/
+
+The underlying technique — set a named quality bar, split the work into
+judgeable pieces, run a builder and a separate blind harsh critic on each,
+and loop until ours wins — originates with Matt Shumer. The upstream
+repository packages it as a reusable skill.
+
+Changes in this copy: none to SKILL.md. This NOTICE was added for
+attribution; the `gauntlet` subagent persona in home/agents/gauntlet.md is
+original work of this repository and simply invokes the skill.
