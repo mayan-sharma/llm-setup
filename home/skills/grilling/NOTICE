@@ -1,0 +1,21 @@
+grilling
+
+Vendored verbatim from mattpocock/skills
+https://github.com/mattpocock/skills
+(skills/productivity/grilling/, main branch @ 068b6e0c6239, fetched 2026-08-16)
+
+License: MIT. Copyright (c) 2026 Matt Pocock.
+The full license text is in LICENSE.
+
+grilling is the reusable interview primitive: it models a plan as a design
+tree, asks the whole settled frontier in numbered rounds with a recommended
+answer per question, dispatches sub-agents to find facts rather than asking
+the user for them, and stops only when the frontier is empty. Upstream it
+also backs grill-with-docs, triage, wayfinder and
+improve-codebase-architecture; only grill-me is vendored here alongside it.
+
+Unlike grill-me this skill is model-invocable, so it can trigger on "grill"
+phrasing without an explicit slash command.
+
+Changes in this copy: none to SKILL.md or agents/openai.yaml. This NOTICE
+was added for attribution.

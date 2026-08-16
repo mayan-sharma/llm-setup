@@ -1,0 +1,41 @@
+skill-inspector
+
+Vendored verbatim from NVIDIA/SkillSpector
+https://github.com/NVIDIA/SkillSpector
+(skills/skill-inspector/SKILL.md, main branch @ 27fd9620dbfe, fetched 2026-08-16)
+
+License: Apache License 2.0. Copyright (c) NVIDIA Corporation.
+The full license text is in LICENSE.
+
+What is vendored here is the SKILL.md only — inert markdown that instructs
+the agent to treat a candidate skill as untrusted input, run two independent
+review lines (static scan + source-aware semantic review), and return a
+verdict of APPROVE / CAUTION / REJECT. It installs no code and runs nothing
+on its own.
+
+The scanner it prefers, the `skillspector` CLI, is deliberately NOT vendored
+and NOT auto-installed. The skill degrades to a manual source review and says
+so explicitly when the CLI is absent. To add the scanner, install it
+separately and keep it out of this repo:
+
+    uv tool install skillspector
+    # or, no Python required:
+    docker run --rm -v "$PWD:/scan" skillspector scan ./my-skill/ --no-llm
+
+Egress, per upstream's own trust model:
+  - It never executes the skill being scanned; analysis is regex, Python AST
+    and YARA over file contents.
+  - LLM semantic analysis is ON by default and uploads eligible file contents
+    to the configured provider. The vendored SKILL.md invokes the CLI with
+    `--no-llm`, which keeps contents local. Keep that flag.
+  - The SC4 supply-chain check queries OSV.dev with declared dependency names
+    and versions (not file contents), even under `--no-llm`, and falls back to
+    a bundled list when offline.
+  - Providers are configurable via SKILLSPECTOR_PROVIDER; OPENAI_BASE_URL
+    accepts any OpenAI-compatible endpoint, so the local LM Studio endpoint in
+    home/local-llm can serve the LLM stage without leaving the machine.
+  - It is a pre-install screen, not a sandbox. It does not contain a skill you
+    install anyway.
+
+Changes in this copy: none to SKILL.md. This NOTICE was added for attribution
+and to record the egress caveats above.
