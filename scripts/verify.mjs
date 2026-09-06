@@ -27,9 +27,14 @@ for (const name of ['AGENTS.md', 'README.md', 'home/AGENTS.md', 'home/config.tom
 const skillsDir = path.join(PAYLOAD, 'skills');
 const skillFiles = existsSync(skillsDir) ? walk(skillsDir) : [];
 const skills = skillFiles.filter(f => f.endsWith(`${path.sep}SKILL.md`));
+// Frontmatter must open the file and carry non-empty `name` and `description`
+// keys; other keys, key order, and `|`/`>` block-scalar descriptions are allowed.
 for (const skill of skills) {
-  if (!/^﻿?---\s*\r?\nname:\s*[^\r\n]+\r?\ndescription:\s*[^\r\n]+\r?\n---/.test(readFileSync(skill, 'utf8')))
-    errors.push(`invalid skill frontmatter: ${rel(skill)}`);
+  const frontmatter = readFileSync(skill, 'utf8').match(/^﻿?---\s*\r?\n([\s\S]*?)\r?\n---/);
+  const valid = frontmatter
+    && /^name:[ \t]*\S/m.test(frontmatter[1])
+    && /^description:[ \t]*(?:[^|>\s][^\r\n]*|[|>][-+]?[ \t]*\r?\n[ \t]+\S)/m.test(frontmatter[1]);
+  if (!valid) errors.push(`invalid skill frontmatter: ${rel(skill)}`);
 }
 for (const file of skillFiles) {
   const buffer = readFileSync(file);

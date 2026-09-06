@@ -1,0 +1,22 @@
+humanizer
+
+Vendored verbatim from blader/humanizer
+https://github.com/blader/humanizer
+(SKILL.md, LICENSE, agents/openai.yaml; main branch @ e2e92e7b4b82, fetched 2026-09-06)
+
+License: MIT. Copyright (c) 2025 Siqi Chen.
+The full license text is in LICENSE.
+
+The pattern list is derived from Wikipedia's "Signs of AI writing" page,
+maintained by WikiProject AI Cleanup:
+https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing
+
+Upstream's AGENTS.md, README.md, .claude-plugin/, .github/, and
+scripts/validate-package.py are intentionally not vendored: they are
+maintainer and packaging material, and AGENTS.md contains instructions to run
+npx/claude-plugin commands that should not live inside a skills tree.
+
+Changes in this copy: none to SKILL.md or agents/openai.yaml. This NOTICE
+was added for attribution; the `humanizer` subagent persona in
+home/agents/humanizer.md is original work of this repository and simply
+invokes the skill.
