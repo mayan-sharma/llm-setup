@@ -1,6 +1,7 @@
 ---
 name: stale-branch-loop
-description: Audit local and remote Git branches that appear unused, especially branches not updated for more than a configurable age such as 30 days. Use when the user asks to track stale, unused, abandoned, old, inactive, or cleanup-candidate branches, summarize what each branch contains, compare branches to a base branch, or produce a concise branch hygiene report for any repository.
+description: Audit local and remote Git branches that appear unused, especially branches not updated for more than a configurable age such as 30 days. Use when the user asks to track stale, unused, abandoned, old, inactive, or cleanup-candidate branches, summarize what each branch contains, compare branches to a base branch, or produce a concise branch hygiene report for any repository. Also on /stale-branch-loop or $stale-branch-loop.
+argument-hint: "[--days N] [--base branch] [--include-local]"
 ---
 
 # Stale Branch Loop

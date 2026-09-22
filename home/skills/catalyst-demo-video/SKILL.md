@@ -1,6 +1,7 @@
 ---
 name: catalyst-demo-video
 description: Turn a raw screen recording of a Catalyst feature into a branded, sound-designed vertical demo video (intro type-beats → device-framed uncut footage → logo outro). Use when the user asks for a feature demo, product demo clip, or "another video like the preview demo" for Catalyst / Catalyst Companion.
+argument-hint: "[path to screen recording]"
 ---
 
 # Catalyst feature-demo video

@@ -1,6 +1,7 @@
 ---
 name: security-scan-loop
-description: Run a post-implementation security review loop using Semgrep and Trivy, validate findings against the code, identify false positives, prioritize real risks, and produce a concise evidence-backed report. Use when the user says code is done, asks for a security scan or security report, wants Semgrep and Trivy run, or explicitly invokes $security-scan-loop.
+description: Run a post-implementation security review loop using Semgrep and Trivy, validate findings against the code, identify false positives, prioritize real risks, and produce a concise evidence-backed report. Use when the user says code is done, asks for a security scan or security report, wants Semgrep and Trivy run, or explicitly invokes /security-scan-loop or $security-scan-loop.
+argument-hint: "[path or diff range]"
 ---
 
 # Security Scan Loop
@@ -14,7 +15,8 @@ Read [references/triage-and-report.md](references/triage-and-report.md) before c
 
 - Target: default to the current project root
 - Scope: default to the working tree; honor a user-specified path or diff scope
-- Artifact directory: create an isolated temporary directory outside the target
+- Artifact directory: the harness scratchpad directory when the session names one, otherwise
+  `mktemp -d`. Never inside the target.
 - Maximum diagnostic cycles per finding: 3
 
 ## Loop
@@ -24,8 +26,9 @@ Read [references/triage-and-report.md](references/triage-and-report.md) before c
 2. Verify `semgrep` and `trivy` are available. Report a missing tool instead of silently replacing
    it.
 3. Record tool versions and database age when available.
-4. Run Semgrep with the project's configuration when present; otherwise use an appropriate broad
-   ruleset such as `--config auto`. Save JSON output.
+4. Run Semgrep with the project's configuration when present; otherwise use `--config p/default`.
+   Always pass `--metrics=off`. Never use `--config auto`: it requires metrics and sends project
+   identifiers to semgrep.dev. Save JSON output.
 5. Run Trivy filesystem scanning for vulnerabilities, secrets, and misconfigurations. Save JSON
    output.
 6. Exclude generated dependency/build directories when scanners do not already exclude them, but
@@ -47,12 +50,17 @@ Read [references/triage-and-report.md](references/triage-and-report.md) before c
 Adapt paths and existing project configuration as needed:
 
 ```bash
-semgrep scan --config auto --json --output <artifact-dir>/semgrep.json <target>
+semgrep scan --metrics=off --config p/default --json \
+  --exclude node_modules --exclude dist --exclude build --exclude .git --exclude '<artifact-dir>' \
+  --output <artifact-dir>/semgrep.json <target>
 trivy fs --scanners vuln,secret,misconfig --format json \
+  --skip-dirs node_modules,dist,build,.git \
   --output <artifact-dir>/trivy.json <target>
 ```
 
-Use project-owned Semgrep configuration instead of `auto` when present. Preserve lockfile scanning.
+Use project-owned Semgrep configuration (`.semgrep.yml`, `.semgrep/`) instead of `p/default` when
+present; keep `--metrics=off` either way. Rule packs are still downloaded from the registry on first
+use, which is the only network call the scan makes. Preserve lockfile scanning.
 Skip bulky generated directories such as `node_modules`, build outputs, and scanner artifact
 directories when necessary.
 

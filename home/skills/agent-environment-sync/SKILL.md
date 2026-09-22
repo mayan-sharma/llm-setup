@@ -1,6 +1,7 @@
 ---
 name: agent-environment-sync
-description: Publish a reusable personal skill to the version-controlled agent bootstrap repository, or pull and install the latest personal environment on another computer, across every configured harness (Codex, Claude Code, pi, and more).
+description: Publish a reusable personal skill to the version-controlled agent bootstrap repository, or pull and install the latest personal environment on another computer, across every configured harness (Codex, Claude Code, pi, and more). Use on /agent-environment-sync or $agent-environment-sync, or when asked to publish, push, save, pull, or sync a personal skill or environment.
+argument-hint: "[push <skill> | sync | targets]"
 ---
 
 # Agent environment sync

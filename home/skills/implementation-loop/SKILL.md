@@ -1,6 +1,7 @@
 ---
 name: implementation-loop
-description: Research, plan, critique, and implement a non-trivial software change from a user goal. Use when the user asks Codex to implement a feature, fix, refactor, or architecture change with deep context gathering; asks to fan out approaches and fan in on one; asks for a research-backed implementation plan or prompt; asks for approval-gated implementation; says "do what you just did"; or explicitly invokes $implementation-loop.
+description: Research, plan, critique, and implement a non-trivial software change from a user goal. Use when the user asks the agent to implement a feature, fix, refactor, or architecture change with deep context gathering; asks to fan out approaches and fan in on one; asks for a research-backed implementation plan or prompt; asks for approval-gated implementation; says "do what you just did"; or explicitly invokes /implementation-loop or $implementation-loop.
+argument-hint: "[goal]"
 ---
 
 # Implementation Loop

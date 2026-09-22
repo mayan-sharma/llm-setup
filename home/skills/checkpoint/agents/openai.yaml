@@ -1,4 +1,4 @@
 interface:
   display_name: "Checkpoint"
-  short_description: "Save fast, evidence-grounded work state"
-  default_prompt: "Use $checkpoint to save an accurate, compact repository handoff."
+  short_description: "Save, list, resume, or hand off work state"
+  default_prompt: "Use $checkpoint to save an accurate, compact repository handoff, or $checkpoint resume <name> to continue from one."

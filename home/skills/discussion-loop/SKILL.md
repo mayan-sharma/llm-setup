@@ -1,6 +1,7 @@
 ---
 name: discussion-loop
-description: Research a technical product or architecture topic and produce a clean, concise GitHub Discussion-style proposal with implementation pointers. Use when the user asks to explore an idea, compare approaches, raise a GitHub discussion, draft an engineering discussion, or turn broad research into a decision-oriented discussion post. Prioritize concise pointers over long RFCs.
+description: Research a technical product or architecture topic and produce a clean, concise GitHub Discussion-style proposal with implementation pointers. Use when the user asks to explore an idea, compare approaches, raise a GitHub discussion, draft an engineering discussion, or turn broad research into a decision-oriented discussion post, or invokes /discussion-loop or $discussion-loop. Prioritize concise pointers over long RFCs.
+argument-hint: "[topic or idea]"
 ---
 
 # Discussion Loop

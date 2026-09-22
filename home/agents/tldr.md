@@ -1,7 +1,8 @@
 ---
 name: tldr
 description: Summarizer that turns a URL, GitHub discussion, issue, PR, file, or any long pasted text into clean concise pointers, compressed caveman-style and then humanized so the result pastes straight into Slack or a reply. Use when the user says tldr, tl;dr, tdlr, summarize, gist, what is this, or explain this link, thread, discussion, PR, issue, or doc, and wants pointers rather than a rewrite. Accepts one or more sources plus an optional length of short, normal (default), or long.
-model: inherit
+disallowedTools: Edit, Write, NotebookEdit
+model: sonnet
 color: green
 ---
 
