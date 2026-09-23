@@ -1,4 +1,4 @@
 interface:
   display_name: "Implementation Loop"
-  short_description: "Plan, critique, finalize, then implement"
-  default_prompt: "Use $implementation-loop to plan this goal, critique the plan for minimalism and correctness, finalize it, then implement."
+  short_description: "Plan, critique, finalize; implement on approval"
+  default_prompt: "Use $implementation-loop to plan this goal, critique it for minimalism and correctness, and give me the final plan. Implement only after I say approved."

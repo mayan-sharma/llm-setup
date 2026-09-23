@@ -1,17 +1,12 @@
 ---
 name: implementation-loop
-description: Plan, critique, finalize, then implement a non-trivial software change. Drafts a plan from repo and research context, runs it past a minimalism critic (ponytail) and an independent correctness critic, puts open decisions to the user as a grilling round, and folds everything into one final plan before any code is written. Use when the user asks to form a plan and critique it, "critique with ponytail", "plan, critique, finalize", fan out approaches and converge on one, wants an approval-gated or plan-only implementation, asks to implement a feature, fix, refactor, or architecture change with deep context gathering, says "do what you just did", or invokes /implementation-loop or $implementation-loop.
-argument-hint: "[goal] [plan-only]"
+description: Plan, critique, and finalize a non-trivial software change, then stop for approval; implement only after the user says "approved", using Opus subagents. Drafts a plan from repo and research context, runs it past a minimalism critic (ponytail) and an independent correctness critic, puts open decisions to the user as a grilling round, and folds everything into one final plan before any code is written. Use when the user asks to form a plan and critique it, "critique with ponytail", "plan, critique, finalize", fan out approaches and converge on one, wants an approval-gated implementation, asks to implement a feature, fix, refactor, or architecture change with deep context gathering, says "do what you just did", or invokes /implementation-loop or $implementation-loop.
+argument-hint: "[goal]"
 ---
 
 # Implementation Loop
 
-Plan, critique, finalize, then build. No code until the plan has survived its critics.
-
-## Modes
-
-- **Plan-only**: the user says "plan", "don't implement", "give me the final plan", or "plan-only". Stop after Finalize.
-- **Full** (default): continue to Implement after Finalize, pausing at the approval gate when it applies.
+Plan, critique, finalize, then **stop**. Implementation starts only when the user says "approved", and it runs through Opus subagents.
 
 Honor explicit constraints from the prompt: "do not commit", "no tests", a named branch, a named base.
 
@@ -69,14 +64,20 @@ Fold the critics' accepted findings and the user's answers into one final plan, 
 - what each critic changed, one line each;
 - what was rejected and why, one line each.
 
-Plan-only mode stops here.
+End the reply with: `Reply "approved" to implement.` Then stop.
 
-## 6. Approval gate
+## 6. Approval gate (always)
 
-Wait for an explicit go-ahead when the user asked for approval, or the plan changes a public API, durable data, or a release process, or is hard to unwind. Otherwise proceed.
+- Never implement in the same turn as Finalize, whatever the change size.
+- Only an explicit "approved" (or "approve", "go ahead, approved") from the user opens the gate. "Looks good", "ok", or a question does not.
+- Feedback instead of approval: revise the plan, re-run the critics if the change is material, re-finalize, and stop again.
 
-## 7. Implement
+## 7. Implement (Opus subagents)
 
+- Hand the approved plan to one or more subagents with `model: "opus"`, never implementing in the main thread. Split into parallel subagents only when steps touch disjoint files.
+- Each brief carries: the approved plan verbatim, the step(s) it owns, files it may touch, non-goals, the user's constraints (no commits, no tests, branch), and the checks it must run before reporting.
+- The main thread coordinates and reviews: read each subagent's diff, fix or re-dispatch deviations from the plan, then verify.
+- In a harness without model selection, use the strongest available model for the subagent and say so in the report.
 - Stay inside the final plan and its non-goals. No drive-by refactors.
 - Reuse existing helpers and conventions before adding abstractions.
 - Leave commits, pushes, and PRs to the user unless they asked.
@@ -97,7 +98,7 @@ Concise pointers:
 
 ## Boundaries
 
-- No code before Finalize, and none before approval when the gate applies.
+- No code before the user says "approved". No implementation outside Opus subagents.
 - Never hide uncertainty behind confident wording.
 - No destructive commands; no reverting user changes.
 - Prefer primary sources over stale or unofficial ones.
