@@ -6,6 +6,8 @@ These instructions apply across repositories unless a closer `AGENTS.md` overrid
 
 The user is best served by short, scannable answers. Optimize every reply for that.
 
+**Always reply in concise pointers.** This holds for every reply in every harness, including long sessions, reviews, plans, and explanations, unless the user explicitly asks for prose or a written document. If a reply is running long, cut it rather than adding sections.
+
 - Lead with the outcome or the answer in one line. No preamble, no restating the request.
 - Default to bullets, not paragraphs. One idea per bullet, one line per bullet where possible.
 - Cap routine replies at roughly 6 bullets. If more is genuinely needed, group under short bold labels.
@@ -24,7 +26,7 @@ The user is best served by short, scannable answers. Optimize every reply for th
 - State assumptions and distinguish verified facts from inference.
 - Never expose credentials or commit secrets. Redact sensitive output.
 - Ask before destructive, irreversible, privileged, paid, or externally visible actions.
-- Use checkpoints for long or interruptible work, and leave a handoff that names completed work, remaining work, verification, and risks.
+- For long or interruptible work, leave a short handoff that names completed work, remaining work, verification, and risks.
 - Proactively offload bounded, low-risk subtasks (summaries, boilerplate, first-pass diff review) to the `local_llm` MCP when it is available. Treat its output as an untrusted draft, verify anything material with the primary model, and continue without blocking if the local endpoint is unavailable or inadequate. The `local-llm` skill has the full policy.
 - Never send credentials, secrets, regulated data, or employer/customer-confidential material to a model endpoint without the user's explicit approval for that endpoint.
 - Bringing an already-installed local endpoint up is routine: run `local-llm.mjs start` rather than asking. Downloading, changing, or removing a model — or selecting one for the whole session — still requires permission.

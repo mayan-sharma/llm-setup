@@ -1,180 +1,103 @@
 ---
 name: implementation-loop
-description: Research, plan, critique, and implement a non-trivial software change from a user goal. Use when the user asks the agent to implement a feature, fix, refactor, or architecture change with deep context gathering; asks to fan out approaches and fan in on one; asks for a research-backed implementation plan or prompt; asks for approval-gated implementation; says "do what you just did"; or explicitly invokes /implementation-loop or $implementation-loop.
-argument-hint: "[goal]"
+description: Plan, critique, finalize, then implement a non-trivial software change. Drafts a plan from repo and research context, runs it past a minimalism critic (ponytail) and an independent correctness critic, puts open decisions to the user as a grilling round, and folds everything into one final plan before any code is written. Use when the user asks to form a plan and critique it, "critique with ponytail", "plan, critique, finalize", fan out approaches and converge on one, wants an approval-gated or plan-only implementation, asks to implement a feature, fix, refactor, or architecture change with deep context gathering, says "do what you just did", or invokes /implementation-loop or $implementation-loop.
+argument-hint: "[goal] [plan-only]"
 ---
 
 # Implementation Loop
 
-## Core Rule
+Plan, critique, finalize, then build. No code until the plan has survived its critics.
 
-Do not jump straight to code for substantial work. First build enough context to make the
-implementation defensible, then converge on one concise approach, get approval when the user asks
-for it or the change is high-impact, and only then edit.
+## Modes
 
-Use this skill to turn a broad goal into a concrete, verified implementation. The output before
-coding is an implementation prompt/plan: a compact brief that another capable agent or reviewer
-could use to execute the work.
+- **Plan-only**: the user says "plan", "don't implement", "give me the final plan", or "plan-only". Stop after Finalize.
+- **Full** (default): continue to Implement after Finalize, pausing at the approval gate when it applies.
 
-## Inputs
+Honor explicit constraints from the prompt: "do not commit", "no tests", a named branch, a named base.
 
-- Goal: the feature, fix, refactor, migration, or investigation target.
-- Scope: default to the current repository and working tree; honor user-specified paths, branches,
-  platforms, or packages.
-- Approval mode: default to implementing after a clear plan unless the user requests approval first.
-- Test policy: honor explicit constraints such as "do not write tests right now" while still running
-  reasonable existing checks when useful.
+## 1. Context
 
-## Workflow
+- Read the source, docs, config, tests, and prior patterns the goal touches. Use `rg` before slower search.
+- Note dirty files; never revert unrelated work.
+- If the user names an MCP server, skill, or doc (for Catalyst: the `catalyst` MCP, `packages/catalyst-core/mcp_v2/**`), use it; if it is unreachable, say so in one line and use the nearest local source.
+- Research external behavior only when it affects correctness. Turn findings into constraints, not notes.
+- Collect facts yourself. Never ask the user for something the repo or tools can answer.
 
-1. Inspect local context first.
-   - Read relevant source, docs, scripts, tests, config, build files, and prior patterns.
-   - Use `rg` and `rg --files` before slower search tools.
-   - Identify changed or dirty files and avoid reverting unrelated work.
-   - Prefer repository facts over assumptions.
+## 2. Plan
 
-2. Use framework or product context when available.
-   - If the user names an MCP, skill, plugin, or internal context source, use it when exposed.
-   - If a named context source is not callable, say that briefly and use the nearest local source of
-     truth.
-   - For Catalyst work, prefer `packages/catalyst-core/mcp_v2/**`, source code, and docs over stale
-     fallback files unless the user directs otherwise.
-
-3. Research external behavior when it can affect correctness.
-   - Browse primary sources, official docs, platform docs, standards, or source repositories for
-     current behavior.
-   - Use links only when they materially support a decision.
-   - Do not pad the plan with research notes; convert research into implementation constraints.
-
-4. Ask clarifying questions when needed.
-   - Ask the smallest useful set, normally 1-3 questions.
-   - Ask before coding when ambiguity changes the API, data model, privacy/security behavior,
-     compatibility, persistence, or migration path.
-   - If a question is low-risk, state the assumption and continue.
-
-5. Fan out approaches.
-   - Consider at least:
-     - the minimal local patch;
-     - the idiomatic repo-native implementation;
-     - the broader architecture that may be more complete but riskier;
-     - platform/library constraints from research.
-   - Reject options for concrete reasons: blast radius, testability, lifecycle risk, user API
-     complexity, security/privacy, or mismatch with repo patterns.
-
-6. Fan in on one implementation approach.
-   - Produce a concise implementation prompt/plan with:
-     - goal and non-goals;
-     - known facts and assumptions;
-     - files/modules likely to change;
-     - proposed behavior and lifecycle;
-     - edge cases and rollback/cleanup behavior;
-     - validation plan;
-     - open questions, if any.
-   - Keep it short enough for approval and execution. Avoid RFC-sized output unless asked.
-
-7. Critique the plan.
-   - Use a separate subagent when available and appropriate. Give it the plan, raw goal, relevant
-     files, and ask for a brutal implementation review.
-   - If no subagent capability is available, perform a distinct self-critique pass and label it as
-     such.
-   - Address real issues before asking for approval or coding.
-
-8. Get approval when required.
-   - Required when the user explicitly asks for approval, when the plan changes public APIs or
-     durable data, or when the implementation could be hard to unwind.
-   - Present the final approach in clean steps and ask for approval.
-   - If the user gives clarifications, update the plan and proceed according to the newest
-     instruction.
-
-9. Implement.
-   - Keep edits scoped to the approved approach and existing ownership boundaries.
-   - Use existing helpers, conventions, and local abstractions before introducing new ones.
-   - Preserve explicit exclusions and non-goals from the plan.
-   - Before editing, announce the file area and intended change.
-
-10. Verify.
-    - Run focused checks that match the change: syntax, typecheck, unit/integration tests, build,
-      platform compile, smoke test, or manual runtime verification.
-    - If the user said not to write tests, do not add test files, but still run existing checks when
-      useful.
-    - If a check is blocked by environment or pre-existing configuration, record the exact blocker
-      and use the next-best focused check.
-
-11. Report.
-    - Summarize changed behavior and key files.
-    - Report validation commands and outcomes.
-    - Call out skipped tests, blockers, assumptions, and follow-up work.
-
-## Implementation Prompt Shape
-
-Use this compact shape before coding, adapting section names to the task:
+Fan out 2-3 approaches (minimal local patch, repo-idiomatic, broader) and converge on one. Draft it in this shape, concise pointers only:
 
 ```markdown
 ## Goal
-
-<One or two sentences.>
-
-## Non-Goals
-
-- ...
-
-## Facts From Repo / Research
-
-- ...
-
-## Approach
-
-1. ...
-2. ...
-3. ...
-
-## Edge Cases
-
-- ...
-
+## Non-goals
+## Facts (repo / research)
+## Approach (numbered steps, files named)
+## Edge cases
 ## Validation
-
-- ...
-
-## Questions / Assumptions
-
-- ...
+## Open decisions
 ```
 
-## Critic Prompt Shape
+## 3. Critique
 
-When using a subagent or doing a separate critique pass, use a prompt like:
+Run two critics in parallel, each with fresh context, given the raw goal, the draft plan, and the relevant file paths:
 
-```text
-Review this implementation plan brutally for correctness, missing edge cases, repo fit,
-security/privacy risk, validation gaps, and over-engineering. Do not rewrite the plan unless needed;
-return concrete blockers, important risks, and suggested changes.
+- **Minimalism critic**: the `ponytail` agent. Ask what can be deleted, reused, or done with stdlib, native features, or existing deps; which steps are speculative.
+- **Correctness critic**: a separate general-purpose agent. Ask for blockers, regressions, missing edge cases, repo fit, security or privacy risk, and validation gaps. For a framework or library, include downstream consumers of every public API the plan touches.
 
-Goal:
-...
+Where the harness has no subagents, run each critique as a distinct, labeled self-critique pass instead.
 
-Plan:
-...
+Critics return findings, not rewrites. Discard findings that contradict verified repo facts, and say why in one line.
 
-Relevant files/context:
-...
+## 4. Grill
+
+Anything the critics surfaced that is the user's call (API shape, compatibility, scope, rollout, naming) goes to the user as one round, grilling-style:
+
 ```
+❓ **Q1** - **<title>**: <question, with options>
+➡️ <recommended answer>
+```
+
+- Ask only real decisions; state low-risk assumptions instead.
+- Ask the whole round at once, then wait.
+- No open decisions: skip this step.
+
+## 5. Finalize
+
+Fold the critics' accepted findings and the user's answers into one final plan, same shape as step 2. Then report in concise pointers:
+
+- the final plan;
+- what each critic changed, one line each;
+- what was rejected and why, one line each.
+
+Plan-only mode stops here.
+
+## 6. Approval gate
+
+Wait for an explicit go-ahead when the user asked for approval, or the plan changes a public API, durable data, or a release process, or is hard to unwind. Otherwise proceed.
+
+## 7. Implement
+
+- Stay inside the final plan and its non-goals. No drive-by refactors.
+- Reuse existing helpers and conventions before adding abstractions.
+- Leave commits, pushes, and PRs to the user unless they asked.
+
+## 8. Verify
+
+- Run the narrowest checks that prove the change: typecheck, lint, focused tests, build, or a runtime smoke test.
+- If the user said no tests, add none, but still run existing checks.
+- A blocked check is reported with its exact error and the next-best check that ran.
+
+## 9. Report
+
+Concise pointers:
+
+- what changed, by file;
+- checks run and their results;
+- skipped work, assumptions, and follow-ups.
 
 ## Boundaries
 
-- Do not hide uncertainty behind confident wording.
-- Do not implement before requested approval.
-- Do not use broad rewrites to solve narrow goals.
-- Do not add tests when the user explicitly says not to write tests.
-- Do not run destructive commands or revert unrelated user changes.
-- Do not depend on unofficial or stale external sources when primary docs are available.
-- Do not stop after planning when the user expects implementation and approval is not required.
-
-## Final Response
-
-Report:
-
-- what was implemented or, if approval-only, the approved plan;
-- important files changed;
-- validation performed;
-- known limitations or follow-ups.
+- No code before Finalize, and none before approval when the gate applies.
+- Never hide uncertainty behind confident wording.
+- No destructive commands; no reverting user changes.
+- Prefer primary sources over stale or unofficial ones.

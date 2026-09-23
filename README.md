@@ -57,8 +57,6 @@ safe — differing destination files are first backed up under
   registers into every MCP-capable harness; the `local-llm` skill carries the offload
   policy and configuration. Start the endpoint with `node scripts/local-llm.mjs start`,
   diagnose it with `doctor`.
-- Checkpoints: `node "${AGENTS_HOME:-$HOME/.agents}/tools/checkpoint.mjs"
-  create|show|list`; the `checkpoint` skill carries the workflow.
 - Customize by editing `home/` or `adapters/`, committing, and rerunning bootstrap. Never
   edit installed copies; `verify.mjs` reports drift.
 - Pin per-machine targets with a git-ignored `targets.local.json`:
