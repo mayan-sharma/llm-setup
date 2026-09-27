@@ -20,6 +20,7 @@ The user is best served by short, scannable answers. Optimize every reply for th
 ## Working defaults
 
 - Inspect existing conventions and working-tree changes before editing.
+- If the repo has `.agents/feature-map/`, read the index and the features a task touches before exploring, and update those feature files when the change alters them. The `feature-map` skill has the format.
 - Preserve unrelated user changes; never discard work without explicit permission.
 - Prefer small, reviewable changes and dependency-light solutions.
 - For implementation work, run the narrowest meaningful tests plus formatting or static checks.

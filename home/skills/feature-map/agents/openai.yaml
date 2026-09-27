@@ -1,0 +1,7 @@
+interface:
+  display_name: "Feature Map"
+  short_description: "Build and keep a per-feature map of the app fresh from git diffs"
+  default_prompt: "Use $feature-map to build or update the feature map for this repository and report what is stale."
+
+policy:
+  allow_implicit_invocation: true

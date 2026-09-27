@@ -12,6 +12,7 @@ Honor explicit constraints from the prompt: "do not commit", "no tests", a named
 
 ## 1. Context
 
+- If the repo has `.agents/feature-map/`, start there: read the index and the features the goal touches (the `feature-map` skill). Verify what the plan relies on; plan to update touched feature files in the same change.
 - Read the source, docs, config, tests, and prior patterns the goal touches. Use `rg` before slower search.
 - Note dirty files; never revert unrelated work.
 - If the user names an MCP server, skill, or doc (for Catalyst: the `catalyst` MCP, `packages/catalyst-core/mcp_v2/**`), use it; if it is unreachable, say so in one line and use the nearest local source.
