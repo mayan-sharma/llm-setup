@@ -78,8 +78,13 @@ function validateSkill(source) {
   if (!existsSync(source) || !statSync(source).isDirectory()) die(`skill directory not found: ${source}`);
   const manifest = path.join(source, 'SKILL.md');
   if (!existsSync(manifest)) die(`skill has no SKILL.md: ${source}`);
-  if (!/^﻿?---\s*\r?\nname:\s*[^\r\n]+\r?\ndescription:\s*[^\r\n]+\r?\n---/.test(readFileSync(manifest, 'utf8')))
+  // Same rule as verify.mjs: extra keys, any order, and block-scalar descriptions are allowed.
+  const frontmatter = readFileSync(manifest, 'utf8').match(/^﻿?---\s*\r?\n([\s\S]*?)\r?\n---/);
+  const name = frontmatter && frontmatter[1].match(/^name:[ \t]*(\S[^\r\n]*)/m);
+  if (!name || !/^description:[ \t]*(?:[^|>\s][^\r\n]*|[|>][-+]?[ \t]*\r?\n[ \t]+\S)/m.test(frontmatter[1]))
     die('SKILL.md needs name and description frontmatter');
+  const declared = name[1].trim().replace(/^(["'])(.*)\1$/, '$2');
+  if (declared !== path.basename(source)) die(`SKILL.md name "${declared}" must match directory name "${path.basename(source)}"`);
   for (const file of walk(source)) {
     if (lstatSync(file).isSymbolicLink()) die(`symbolic links are not portable: ${file}`);
     const buffer = readFileSync(file);
