@@ -32,3 +32,4 @@ The user is best served by short, scannable answers. Optimize every reply for th
 - Never send credentials, secrets, regulated data, or employer/customer-confidential material to a model endpoint without the user's explicit approval for that endpoint.
 - Bringing an already-installed local endpoint up is routine: run `local-llm.mjs start` rather than asking. Downloading, changing, or removing a model — or selecting one for the whole session — still requires permission.
 - When asked to publish or sync a personal skill, use the `agent-environment-sync` skill. Preview changes and exclude work-owned, confidential, secret, or machine-specific material.
+- After substantial work in the main interactive session (multi-step change, diagnosed failure, or a user correction), end the final reply with one line suggesting `/learn` (`$learn` in Codex). Skip it in subagents, handoffs, and reviews, or if already suggested. Never run it unprompted.

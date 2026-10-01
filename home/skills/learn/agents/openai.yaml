@@ -1,0 +1,7 @@
+interface:
+  display_name: "Learn"
+  short_description: "Review skills used this session and propose approval-gated improvements"
+  default_prompt: "Use $learn to review the skills used in this session and propose anything worth keeping as numbered approval cards."
+
+policy:
+  allow_implicit_invocation: false
