@@ -1,0 +1,19 @@
+{
+  "name": "laya",
+  "command": {
+    "darwin": "{AGENTS_REPO}/runtime/laya/.venv/bin/python",
+    "linux": "{AGENTS_REPO}/runtime/laya/.venv/bin/python",
+    "win32": "{AGENTS_REPO}/runtime/laya/.venv/Scripts/python.exe"
+  },
+  "requires": {
+    "darwin": "{AGENTS_REPO}/runtime/laya/.venv/bin/python",
+    "linux": "{AGENTS_REPO}/runtime/laya/.venv/bin/python",
+    "win32": "{AGENTS_REPO}/runtime/laya/.venv/Scripts/python.exe"
+  },
+  "args": ["-m", "laya.mcp.server"],
+  "env": {
+    "HF_HOME": "{AGENTS_REPO}/runtime/laya/.hf-cache",
+    "LAYA_PRELOAD": "0",
+    "LAYA_DEFAULT_MODEL": "english"
+  }
+}

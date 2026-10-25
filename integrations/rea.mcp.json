@@ -1,0 +1,14 @@
+{
+  "name": "rea",
+  "command": {
+    "darwin": "node",
+    "linux": "node",
+    "win32": "node"
+  },
+  "requires": {
+    "darwin": "{AGENTS_REPO}/runtime/rea/node_modules/rea-agents/scripts/rea.mjs",
+    "linux": "{AGENTS_REPO}/runtime/rea/node_modules/rea-agents/scripts/rea.mjs",
+    "win32": "{AGENTS_REPO}/runtime/rea/node_modules/rea-agents/scripts/rea.mjs"
+  },
+  "args": ["{AGENTS_REPO}/runtime/rea/node_modules/rea-agents/scripts/rea.mjs", "mcp"]
+}

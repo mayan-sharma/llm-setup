@@ -12,6 +12,7 @@ function tokens() {
   return {
     '{AGENTS_TOOLS}': sharedToolsDir(),
     '{AGENTS_HOME}': agentsHome(),
+    '{AGENTS_REPO}': REPO_ROOT,
   };
 }
 
@@ -41,6 +42,7 @@ function resolve(manifest, home) {
   const command = manifest.command[process.platform];
   if (!command || typeof command !== 'string') return null; // no command for this platform
   return {
+    requires: manifest.requires?.[process.platform] ? expand(manifest.requires[process.platform], home) : null,
     name: manifest.name,
     command: expand(command, home),
     args: manifest.args.map(a => expand(a, home)),
@@ -73,7 +75,9 @@ function codexEquivalent(current, desired) {
   const t = current?.transport;
   if (!t || t.type !== 'stdio' || t.command !== desired.command) return false;
   if (JSON.stringify(t.args || []) !== JSON.stringify(desired.args)) return false;
-  return JSON.stringify(t.env || {}) === JSON.stringify(desired.env);
+  // Codex does not preserve env key order, so compare sorted entries.
+  const sorted = env => JSON.stringify(Object.entries(env || {}).sort(([a], [b]) => a.localeCompare(b)));
+  return sorted(t.env) === sorted(desired.env);
 }
 
 // Reconcile all manifests into one adapter. Returns a list of log lines.
@@ -96,6 +100,8 @@ export function reconcileAdapter(adapter, { dryRun = false } = {}) {
   for (const manifest of manifests) {
     const desired = resolve(manifest, home);
     if (!desired) { logs.push(`skip     mcp:${manifest.name} (${adapter.name}: no ${process.platform} command)`); continue; }
+    // Opt-in integrations name a local runtime they need; skip until it is set up.
+    if (desired.requires && !existsSync(desired.requires)) { logs.push(`skip     mcp:${manifest.name} (${adapter.name}: ${desired.requires} not set up)`); continue; }
 
     if (method === 'codex-cli') {
       const got = cli(bin, ['mcp', 'get', desired.name, '--json'], true);

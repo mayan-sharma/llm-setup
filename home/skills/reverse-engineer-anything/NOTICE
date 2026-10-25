@@ -1,0 +1,38 @@
+reverse-engineer-anything
+
+Vendored from morluto/rea
+https://github.com/morluto/rea
+(.agents/skills/reverse-engineer-anything/, tag rea-agents-6.5.0, fetched 2026-10-17)
+
+License: MIT. Copyright (c) 2026 morluto. The full license text is in LICENSE.
+
+It is the companion skill for the `rea-agents` MCP server. The skill and the
+server must stay on the same version: the skill's tool routing assumes the
+server's tool list.
+
+Runtime (opt-in, git-ignored). The MCP registers only where this exists:
+
+    npm install --prefix runtime/rea --no-save --no-package-lock rea-agents@6.5.0
+
+Requires Node.js 22.19+, 24.11+, or 26+. Re-run bootstrap afterwards. REA's own
+`rea setup` is deliberately not used: this repo owns the MCP registration and
+this skill copy, and setup would overwrite both.
+
+Reviewed with skill-inspector on 2026-10-17: CAUTION, no malicious content.
+Changes in this copy, all from that review:
+  - SKILL.md "Connect only when needed": rewritten. No `rea setup`, `rea
+    update`, or `npx rea-agents@latest`; report a missing registration or
+    provider instead of repairing it.
+  - Running or driving a target (browser scenarios, process/native-call
+    capture, Electron Inspector, behavioral probes) now needs the user's
+    explicit approval: SKILL.md, references/javascript-applications.md,
+    references/runtime-observation.md.
+  - Fiddler Everywhere live traffic: mention its MCP, do not connect or
+    install it.
+  - references/connection-and-recovery.md: removed "Repair registration when
+    needed", the Codex per-tool preapproval block, and the CODEX_HOME example;
+    package acquisition replaced with "report that".
+  - Doc links pinned from `blob/main/` to `blob/rea-agents-6.5.0/`.
+
+To bump: re-vendor from the new tag, re-apply the changes above, re-review
+with skill-inspector, and update the version here and in runtime/rea.
