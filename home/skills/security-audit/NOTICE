@@ -1,0 +1,22 @@
+security-audit
+
+Vendored verbatim from cloudflare/security-audit-skill
+https://github.com/cloudflare/security-audit-skill
+(skills/security-audit/* and LICENSE; main branch @ c1c8a8c14710, fetched 2026-11-07)
+
+License: MIT. Copyright (c) 2025-2026 Cloudflare, Inc.
+The full license text is in LICENSE.
+
+Upstream's README.md is intentionally not vendored: it is install and
+packaging material (npx skills add ...), not part of the skill.
+
+Pre-install review (manual; skillspector CLI was not installed):
+  - validate-findings.cjs and validate-coverage-ledger.cjs only open and read
+    the JSON file they are given; no network, no child processes, no writes.
+  - The *.test.cjs files spawn `node` on those validators (and `mkfifo`).
+  - No URLs, install commands, or hidden Unicode in the markdown or schema.
+
+Usage note: the full-audit mode launches many parallel subagents, so run it
+from the main session, not from inside a subagent persona.
+
+Changes in this copy: none. This NOTICE was added for attribution.

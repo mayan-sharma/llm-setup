@@ -74,7 +74,8 @@ for (const manifest of manifests) {
 }
 
 // --- Credentials in payload ---
-const forbidden = /(auth\.json|api[_-]?key\s*=|bearer\s+[a-z0-9])/i;
+// Bearer needs a token-length value so prose like "bearer token" does not trip it.
+const forbidden = /(auth\.json|api[_-]?key\s*=|bearer\s+[a-z0-9._~+/=-]{20,})/i;
 for (const file of existsSync(PAYLOAD) ? walk(PAYLOAD) : []) {
   if (forbidden.test(readFileSync(file, 'utf8'))) errors.push(`possible credential or forbidden state: ${rel(file)}`);
 }
