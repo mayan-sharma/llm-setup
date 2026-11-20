@@ -155,19 +155,12 @@ function installInstructions(adapter, home) {
   }
 }
 
-// `extraFiles` entries are relative to `home/<adapter.payload>` (default `home/`) and
-// may name a directory, which is copied file by file.
 function installExtraFiles(adapter, home) {
-  const root = path.join(PAYLOAD, adapter.payload || '');
   for (const rel of adapter.extraFiles || []) {
-    const src = path.join(root, rel);
+    const src = path.join(PAYLOAD, rel);
     const managedToml = rel === adapter.mcpConfigFile;
-    if (!existsSync(src)) { console.log(`skip     ${adapter.name}:${rel} (missing in payload)`); continue; }
-    const files = statSync(src).isDirectory() ? walk(src) : [src];
-    for (const file of files) {
-      const fileRel = path.relative(root, file).replaceAll(path.sep, '/');
-      installFile(file, path.join(home, fileRel), `${adapter.name}:${fileRel}`, { managedToml });
-    }
+    if (existsSync(src)) installFile(src, path.join(home, rel), `${adapter.name}:${rel}`, { managedToml });
+    else console.log(`skip     ${adapter.name}:${rel} (missing in payload)`);
   }
 }
 
