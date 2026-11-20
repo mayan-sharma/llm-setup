@@ -1,0 +1,116 @@
+{
+  "id": "root",
+  "type": "column",
+  "titlebar": "none",
+  "traffic_lights": [
+    20,
+    18
+  ],
+  "preview": "layouts/crt.svg",
+  "theme": "crt",
+  "ui_font": "PxPlus IBM VGA 8x16",
+  "background": {
+    "image": "mods/crt/art/screen.png",
+    "fit": "cover"
+  },
+  "terminal_opacity": 0,
+  "terminal_padding": [
+    14,
+    14
+  ],
+  "padding": [
+    8,
+    14
+  ],
+  "gap": 6,
+  "resizable": false,
+  "children": [
+    {
+      "id": "crt-bar",
+      "type": "block",
+      "size": {
+        "px": 30
+      },
+      "window_drag": true,
+      "content": {
+        "mod": "crt",
+        "props": {
+          "role": "bar"
+        }
+      }
+    },
+    {
+      "id": "crt-body",
+      "type": "row",
+      "gap": 12,
+      "padding": [
+        0,
+        0
+      ],
+      "children": [
+        {
+          "id": "sidebar",
+          "type": "block",
+          "size": {
+            "px": 220
+          },
+          "min": 160,
+          "max": 420,
+          "content": {
+            "mod": "crt",
+            "props": {
+              "role": "side"
+            }
+          }
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "gap": 12,
+              "radius": 3,
+              "background": "#04110a59",
+              "lone": true,
+              "border": {
+                "width": 1,
+                "color": "#143f25"
+              },
+              "focus": {
+                "width": 1,
+                "color": "#2a8a4d"
+              },
+              "header": {
+                "content": {
+                  "mod": "crt",
+                  "props": {
+                    "role": "pane"
+                  }
+                },
+                "height": 30,
+                "position": "top",
+                "reveal": "always"
+              }
+            }
+          }
+        },
+        {
+          "id": "crt-right",
+          "type": "block",
+          "size": {
+            "px": 244
+          },
+          "min": 244,
+          "max": 420,
+          "content": {
+            "mod": "crt",
+            "props": {
+              "role": "sys"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

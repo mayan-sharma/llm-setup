@@ -17,6 +17,17 @@ Turn this session into at most **one skill change** and **one repo-doc note**, e
 - Bootstrap repo: the `repository` value in `bootstrap-source.json` in any harness home (`~/.agents`, `~/.codex`, `~/.claude`, `~/.pi/agent`).
 - `AGENTS_HOME` set to a custom path: warn that Codex and pi may still read `~/.agents`.
 
+## 0. Source
+
+- If context holds a compaction summary, review the full transcript, not the summary.
+  Claude: `~/.claude/projects/<cwd-slug>/<session-id>.jsonl` (the summary names it).
+  Codex: the newest file under `~/.codex/sessions/`. Neither found: say so and review context only.
+- From it, extract only: user messages, Skill calls and slash commands, failed tool results,
+  and assistant retractions. Skip tool output bodies.
+- Large transcript: split at compaction boundaries and send one read-only subagent per segment
+  for candidate findings with line refs; the gate in step 2 still applies in the main thread.
+- Say on the first card how many segments were reviewed.
+
 ## 1. Review used skills
 
 - List each skill loaded this session. If you can't tell what loaded, record `unknown`; don't guess.

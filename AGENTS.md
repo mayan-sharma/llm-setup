@@ -63,5 +63,9 @@ pushed features become usable automatically.
   particular harness present.
 - Add reusable workflows as `home/skills/<name>/SKILL.md`; keep supporting scripts beside
   the skill. Publishing must validate the whole skill directory and stage nothing unrelated.
+- Herdr is not a harness, so it has no adapter: `scripts/lib/herdr.mjs` installs
+  `home/herdr-app/` where the app or `hc` is present, and merges only its own marked
+  shell block and its own two Claude hook entries. Capture app-side edits with
+  `node scripts/herdr.mjs capture`; never capture employer-owned mods.
 - Before finishing changes, run `node scripts/verify.mjs`, `node scripts/agents.mjs doctor`,
   and review `git diff --check`.

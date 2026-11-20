@@ -9,6 +9,7 @@ import {
   selectTargets, sharedSkillsDir, sharedToolsDir,
 } from './lib/adapters.mjs';
 import { reconcileAdapter } from './lib/mcp.mjs';
+import { installHerdr } from './lib/herdr.mjs';
 
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
@@ -233,6 +234,14 @@ for (const adapter of targets) {
   }
   writeMetadata(home);
   if (adapter.restartNote) restartNotes.push(`${adapter.displayName}: ${adapter.restartNote}`);
+}
+
+// Herdr desktop app: layouts, mods and session resume, where the app is present.
+try {
+  restartNotes.push(...installHerdr({ installFile, targets }));
+} catch (error) {
+  console.error(`ERROR: herdr: ${error.message}`);
+  process.exitCode = 1;
 }
 
 console.log(`Done: ${changed} installed, ${backedUp} backed up${dryRun ? ' (dry run)' : ''}.`);

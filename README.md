@@ -51,6 +51,16 @@ for cross-harness portability and runs on every `push` and `verify`. Re-running 
 safe — differing destination files are first backed up under
 `.bootstrap-backups/<timestamp>/`. Restart each affected harness afterward.
 
+## Herdr app
+
+`home/herdr-app/` holds personal Herdr desktop app layouts, themes and mods, installed
+into the app's folder (`~/.config/herdr-app`) on machines that have it. Edit them live in
+the app, then bring the changes back with `node scripts/herdr.mjs capture` (add a name to
+start tracking a new layout or mod) and commit; `agents.mjs sync` puts them on the next
+machine. The same step installs session resume: Claude Code hooks record which session
+each Herdr terminal runs, and a managed block in `~/.zshrc` / `~/.bashrc` reopens it with
+`claude --resume` when the terminal comes back as a plain shell after a reboot.
+
 ## Notes
 
 - Codex profiles: `codex --profile deep-review`, `codex --oss --local-provider lmstudio`.
