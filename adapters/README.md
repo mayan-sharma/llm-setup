@@ -31,7 +31,8 @@ any harness.
 | `skills` | `"shared"` (rely on `~/.agents/skills`) or `"private"` (also copy into `<home>/skills`). |
 | `agents` | Optional. Subdirectory of `<home>` receiving `home/agents/*.md` subagent personas (Claude Code: `agents`). Omit for harnesses with no subagent concept — the payload is skipped. |
 | `instructions` | `file` to write in `<home>`; `mode` is `copy` (verbatim `AGENTS.md`) or `import-agents` (generate a file that imports the canonical `AGENTS.md`). |
-| `extraFiles` | Payload files copied verbatim into `<home>` (e.g. Codex `config.toml` profiles). Paths are relative to `home/`. |
+| `payload` | Optional subdirectory of `home/` that `extraFiles` resolve against (Herdr: `herdr`). Defaults to `home/` itself. |
+| `extraFiles` | Payload files or directories copied verbatim into `<home>` (e.g. Codex `config.toml` profiles, Herdr layouts and mods). Paths are relative to `home/<payload>`. |
 | `mcp` | MCP registration method: `codex-cli`, `claude-cli`, or `none`. |
 | `restartNote` | Printed after install so the user knows to reload that harness. |
 

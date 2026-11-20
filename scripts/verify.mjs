@@ -3,7 +3,7 @@
 // definitions, MCP manifests, portability, and installed drift across the shared
 // standard location and every selected harness home.
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import {
   PAYLOAD, REPO_ROOT, SHARED_TOOLS, adapterHome, loadAdapters, selectTargets,
@@ -106,8 +106,15 @@ for (const adapter of targets) {
   if (!existsSync(home)) { warnings.push(`${adapter.name} home missing: ${home}`); continue; }
   if (adapter.instructions && !existsSync(path.join(home, adapter.instructions.file)))
     warnings.push(`${adapter.name} instructions not installed: ${path.join(home, adapter.instructions.file)}`);
+  const extraRoot = path.join(PAYLOAD, adapter.payload || '');
   for (const extra of adapter.extraFiles || []) {
-    if (!existsSync(path.join(home, extra))) warnings.push(`${adapter.name} file not installed: ${path.join(home, extra)}`);
+    const src = path.join(extraRoot, extra);
+    const files = existsSync(src) && statSync(src).isDirectory() ? walk(src) : [src];
+    for (const file of files) {
+      const dest = path.join(home, path.relative(extraRoot, file));
+      if (!existsSync(dest)) warnings.push(`${adapter.name} file not installed: ${dest}`);
+      else if (existsSync(file) && extra !== adapter.mcpConfigFile && hash(file) !== hash(dest)) warnings.push(`${adapter.name} file drift: ${dest}`);
+    }
   }
   if (adapter.skills === 'private' && !existsSync(path.join(home, 'skills'))) warnings.push(`${adapter.name} private skills not installed: ${path.join(home, 'skills')}`);
 }

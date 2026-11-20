@@ -1,0 +1,64 @@
+{
+  "id": "root",
+  "type": "column",
+  "titlebar": "none",
+  "traffic_lights": [14, 16],
+  "theme": "cogitator",
+  "font": "JetBrains Mono",
+  "font_size": 14,
+  "ui_font": "JetBrains Mono",
+  "terminal_padding": [10, 8],
+  "background": "#060806",
+  "preview": "layouts/cogitator.svg",
+  "children": [
+    {
+      "id": "bar",
+      "type": "block",
+      "size": { "px": 46 },
+      "window_drag": true,
+      "content": { "mod": "cogitator", "props": { "role": "bar" } }
+    },
+    {
+      "id": "deck",
+      "type": "row",
+      "children": [
+        {
+          "id": "sidebar",
+          "type": "block",
+          "size": { "px": 236 },
+          "min": 170,
+          "max": 420,
+          "content": { "mod": "cogitator", "props": { "role": "rail" } }
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "padding": [8, 8],
+          "content": {
+            "tab": "active",
+            "pane": {
+              "header": {
+                "content": { "mod": "cogitator", "props": { "role": "pane" } },
+                "height": 28,
+                "position": "top",
+                "reveal": "always"
+              },
+              "background": "#050805",
+              "border": { "width": 1, "color": "#5a4819" },
+              "focus": { "width": 1, "color": "#39ff6a" },
+              "radius": 2,
+              "gap": 8,
+              "lone": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "status",
+      "type": "block",
+      "size": { "px": 26 },
+      "content": { "mod": "cogitator", "props": { "role": "status" } }
+    }
+  ]
+}

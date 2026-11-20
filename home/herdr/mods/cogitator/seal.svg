@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="72" viewBox="0 0 52 72">
+  <!-- parchment strips -->
+  <path d="M15 30l-4 38 6-4 5 6 3-40z" fill="#d9cfa6"/>
+  <path d="M37 30l4 36-6-3-5 7-3-40z" fill="#c9bd90"/>
+  <path d="M14.2 38h8.6M13.6 44h8.8M13 50h9M12.4 56h8.4M31 38h7.4M31.2 44h7.8M31.6 50h8M32 56h8" stroke="#6b5f3c" stroke-width="1"/>
+  <!-- wax -->
+  <path d="M26 2c3 0 4 3 7 3s5-1 7 1 1 5 3 7 5 2 6 5-1 5-1 8 2 5 1 8-4 3-6 5-1 5-3 7-5 1-7 1-4 3-7 3-4-3-7-3-5 1-7-1-1-5-3-7-5-2-6-5 1-5 1-8-2-5-1-8 4-3 6-5 1-5 3-7 5-1 7-1 4-3 7-3z" fill="#8f1410"/>
+  <circle cx="26" cy="24" r="15" fill="#b81d16"/>
+  <circle cx="26" cy="24" r="11.5" fill="none" stroke="#6e0d0a" stroke-width="1.5"/>
+  <path d="M21 17h10v2.4h-3.6v9.2H31V31H21v-2.4h3.6v-9.2H21z" fill="#6e0d0a"/>
+  <path d="M17 13c3-3 8-4 12-3" stroke="#e2584f" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</svg>

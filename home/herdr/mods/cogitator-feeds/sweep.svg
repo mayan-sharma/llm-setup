@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 200 200" fill="#ffffff">
+  <path d="M100 100L100 4A96 96 0 0 0 16.86 52Z" fill-opacity="0.08"/>
+  <path d="M100 100L100 4A96 96 0 0 0 38.3 26.46Z" fill-opacity="0.1"/>
+  <path d="M100 100L100 4A96 96 0 0 0 67.17 9.79Z" fill-opacity="0.14"/>
+  <path d="M100 100L100 4A96 96 0 0 0 86.64 4.93Z" fill-opacity="0.22"/>
+  <path d="M100 100L100 4" stroke="#ffffff" stroke-width="1.4" stroke-opacity="0.95"/>
+</svg>

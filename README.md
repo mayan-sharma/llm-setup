@@ -16,7 +16,8 @@ rules); this README is the short human-facing overview.
 
 - `home/` — the exact payload installed everywhere: global personal instructions
   (`home/AGENTS.md`), `home/skills/`, Codex config profiles, and the optional
-  dependency-free local-LLM MCP server.
+  dependency-free local-LLM MCP server. `home/herdr/` carries custom Herdr app layouts,
+  themes, and mods (the `cogitator` layout), installed by `adapters/herdr.json`.
 - `adapters/<name>.json` — maps the payload into one harness. Adding a harness is one
   JSON file and no code; see `adapters/README.md`.
 - `integrations/*.mcp.json` — declarative MCP registrations reconciled per harness.
