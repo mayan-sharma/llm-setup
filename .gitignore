@@ -8,3 +8,6 @@ __pycache__/
 Thumbs.db
 
 runtime/
+
+# Herdr regenerates editor type files inside mod folders
+home/herdr/mods/*/gpui-kit.d.ts
