@@ -1,0 +1,67 @@
+{
+  "id": "root",
+  "type": "row",
+  "titlebar": "none",
+  "traffic_lights": [18, 18],
+  "preview": "layouts/ascii.svg",
+  "theme": "ascii",
+  "font": "JetBrains Mono",
+  "font_size": 13,
+  "font_weight": 400,
+  "ui_font": "JetBrains Mono NL",
+  "background": "#0b0b0c",
+  "terminal_padding": [10, 14],
+  "terminal_opacity": 1,
+  "resizable": false,
+  "toast": "ascii",
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "block",
+      "size": { "px": 272 },
+      "window_drag": true,
+      "content": { "mod": "ascii", "props": { "role": "rail" } }
+    },
+    {
+      "id": "work",
+      "type": "column",
+      "resizable": false,
+      "children": [
+        {
+          "id": "ascii-strip",
+          "type": "block",
+          "size": { "px": 42 },
+          "window_drag": true,
+          "content": { "mod": "ascii", "props": { "role": "strip" } }
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "gap": 4,
+              "radius": 0,
+              "background": "#0b0b0c",
+              "lone": true,
+              "border": { "width": 1, "color": "#00000000" },
+              "focus": { "width": 1, "color": "#00000000" },
+              "header": {
+                "content": { "mod": "ascii", "props": { "role": "pane" } },
+                "height": 22,
+                "position": "top",
+                "reveal": "always"
+              }
+            }
+          }
+        },
+        {
+          "id": "ascii-line",
+          "type": "block",
+          "size": { "px": 20 },
+          "content": { "mod": "ascii", "props": { "role": "line" } }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "id": "root",
+  "type": "row",
+  "titlebar": "none",
+  "traffic_lights": [
+    18,
+    18
+  ],
+  "preview": "layouts/sumi.svg",
+  "theme": "sumi",
+  "ui_font": "Avenir Next",
+  "background": {
+    "image": "mods/sumi/art/sheet-night-4.jpg",
+    "fit": "cover"
+  },
+  "terminal_padding": [
+    14,
+    18
+  ],
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "block",
+      "size": {
+        "px": 300
+      },
+      "min": 230,
+      "max": 420,
+      "window_drag": true,
+      "content": {
+        "mod": "sumi",
+        "props": {
+          "role": "rail"
+        }
+      }
+    },
+    {
+      "id": "work",
+      "type": "column",
+      "resizable": false,
+      "children": [
+        {
+          "id": "sumi-top",
+          "type": "block",
+          "size": {
+            "px": 46
+          },
+          "window_drag": true,
+          "content": {
+            "mod": "sumi",
+            "props": {
+              "role": "top"
+            }
+          }
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "gap": 10,
+              "radius": 2,
+              "background": "#0a090899",
+              "lone": true,
+              "border": {
+                "width": 1,
+                "color": "#0f0e0d00"
+              },
+              "focus": {
+                "width": 1,
+                "color": "#0f0e0d00"
+              },
+              "header": {
+                "content": {
+                  "mod": "sumi",
+                  "props": {
+                    "role": "pane"
+                  }
+                },
+                "height": 36,
+                "position": "top",
+                "reveal": "always"
+              }
+            }
+          }
+        },
+        {
+          "id": "sumi-foot",
+          "type": "block",
+          "size": {
+            "px": 30
+          },
+          "window_drag": true,
+          "content": {
+            "mod": "sumi",
+            "props": {
+              "role": "blank",
+              "stars": "foot"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "sumi-edge",
+      "type": "block",
+      "size": {
+        "px": 26
+      },
+      "window_drag": true,
+      "content": {
+        "mod": "sumi",
+        "props": {
+          "role": "blank",
+          "stars": "side"
+        }
+      }
+    }
+  ],
+  "terminal_opacity": 0,
+  "terminal_menu": "sumi",
+  "toast": "sumi"
+}

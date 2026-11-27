@@ -1,0 +1,92 @@
+{
+  "id": "root",
+  "type": "row",
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "block",
+      "content": {
+        "mod": "horizon",
+        "props": {
+          "role": "rail"
+        }
+      },
+      "size": {
+        "px": 272
+      },
+      "window_drag": true
+    },
+    {
+      "id": "work",
+      "type": "column",
+      "children": [
+        {
+          "id": "horizon-strip",
+          "type": "block",
+          "content": {
+            "mod": "horizon",
+            "props": {
+              "role": "strip"
+            }
+          },
+          "size": {
+            "px": 44
+          },
+          "window_drag": true
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "header": {
+                "content": {
+                  "mod": "horizon",
+                  "props": {
+                    "role": "pane"
+                  }
+                },
+                "reveal": "always",
+                "height": 36,
+                "position": "top"
+              },
+              "background": "#030304bd",
+              "border": {
+                "width": 1,
+                "color": "#00000000"
+              },
+              "focus": {
+                "width": 1,
+                "color": "#00000000"
+              },
+              "radius": 0,
+              "gap": 6,
+              "lone": true
+            }
+          }
+        }
+      ],
+      "resizable": false
+    }
+  ],
+  "background": {
+    "image": "mods/horizon/art/sky-2.jpg",
+    "fit": "cover"
+  },
+  "theme": "horizon",
+  "font": "JetBrains Mono",
+  "ui_font": "JetBrains Mono",
+  "terminal_padding": [
+    14,
+    22
+  ],
+  "terminal_opacity": 0,
+  "resizable": false,
+  "titlebar": "none",
+  "traffic_lights": [
+    18,
+    18
+  ],
+  "preview": "layouts/horizon.svg"
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- Paints the Horizon layout's sky: stars, dust, and the black hole's light.
+     Inside a circle about the hole the disc itself is left out: the mod draws it there,
+     turning (frames.mjs). export.sh runs this in headless Chrome and saves what it prints. -->
+<html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<canvas id="sky" width="3024" height="1898"></canvas>
+<pre id="out"></pre>
+<script src="hole.js"></script>
+<script>
+(function () {
+  var S = 2, W = 1512 * S, H = 949 * S, K = Hole, rnd = K.rnd;
+  var cv = document.getElementById('sky'), ctx = cv.getContext('2d');
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  var RS = K.rs * S, cx = K.x * S, cy = K.y * S, i;
+
+  // ---------- stars ----------
+  for (i = 0; i < 300; i++) {
+    var x = rnd() * W, y = rnd() * H;
+    var dx = x - cx, dy = y - cy;
+    if (dx * dx + dy * dy < Math.pow(3.4 * RS, 2)) continue;
+    if (x < 360 * S && (y < 540 * S || y > 810 * S)) continue;   // keep the rail's marks and labels unambiguous
+    if (y < 46 * S) continue;
+    var m = Math.pow(rnd(), 3.2);                 // most are faint
+    var r = (0.45 + m * 1.0) * S * 0.62;
+    var a = 0.16 + m * 0.74;
+    var tint = rnd();
+    var col = tint < 0.14 ? '255,206,170' : tint < 0.34 ? '196,212,255' : '236,230,216';
+    if (m > 0.55) {
+      var gr = ctx.createRadialGradient(x, y, 0, x, y, r * 5);
+      gr.addColorStop(0, 'rgba(' + col + ',' + (a * 0.32) + ')');
+      gr.addColorStop(1, 'rgba(' + col + ',0)');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r * 5, 0, 6.2832); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(' + col + ',' + a + ')';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
+  }
+
+  // ---------- the hole: the whole disc for its bloom, and the part outside the mod's circle ----------
+  var size = Math.ceil(K.region * RS * 2), SS = 2;
+  function canvas() { var c = document.createElement('canvas'); c.width = c.height = size; return c; }
+  var whole = canvas(), rest = canvas();
+  var wctx = whole.getContext('2d'), rctx = rest.getContext('2d');
+  var wi = wctx.createImageData(size, size), ri = rctx.createImageData(size, size), wp = wi.data, rp = ri.data;
+  var R_, G_, B_;
+  function add(l, g, b, rc, phi) { var I = l * K.tex(rc, phi, 0); R_ += I; G_ += I * g; B_ += I * b; }
+  for (var py = 0; py < size; py++) for (var px = 0; px < size; px++) {
+    var any = false; R_ = G_ = B_ = 0;
+    for (var sy = 0; sy < SS; sy++) for (var sx = 0; sx < SS; sx++)
+      if (K.trace((px + (sx + 0.5) / SS - size / 2) / RS, -(py + (sy + 0.5) / SS - size / 2) / RS, add)) any = true;
+    var o = (py * size + px) * 4;
+    wp[o + 3] = rp[o + 3] = 255;
+    if (!any) continue;
+    var n = SS * SS, d = rnd() - 0.5;
+    var keep = K.sm(K.inner * S, K.outer * S, Math.sqrt(Math.pow(px + 0.5 - size / 2, 2) + Math.pow(py + 0.5 - size / 2, 2)));
+    for (var c = 0; c < 3; c++) {
+      var v = 255 * (1 - Math.exp(-(c === 0 ? R_ : c === 1 ? G_ : B_) / n * 1.25));
+      wp[o + c] = v + d + 0.5;
+      rp[o + c] = v * keep + d * keep + 0.5;
+    }
+  }
+  wctx.putImageData(wi, 0, 0); rctx.putImageData(ri, 0, 0);
+
+  var ox = cx - size / 2, oy = cy - size / 2;
+  // the shadow swallows whatever is behind it
+  ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx, cy, 2.5 * RS, 0, 6.2832); ctx.fill();
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.drawImage(rest, ox, oy);
+  // bloom: three radii, from tight halation to wide veil
+  ctx.filter = 'blur(' + (3 * S) + 'px)';  ctx.globalAlpha = 0.55; ctx.drawImage(whole, ox, oy);
+  ctx.filter = 'blur(' + (14 * S) + 'px)'; ctx.globalAlpha = 0.42; ctx.drawImage(whole, ox, oy);
+  ctx.filter = 'blur(' + (60 * S) + 'px)'; ctx.globalAlpha = 0.38; ctx.drawImage(whole, ox, oy);
+  ctx.filter = 'none'; ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+
+  // ---------- dust + film grain, computed in float and dithered (no banding) ----------
+  var GW = 190, GH = 120, dust = new Float32Array(GW * GH);
+  var HT = new Float32Array(4096); for (i = 0; i < 4096; i++) HT[i] = rnd();
+  function h2d(ix, iy) { return HT[((ix * 73) ^ (iy * 151) ^ (ix * iy * 7)) & 4095]; }
+  function n2(x, y) {
+    var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    var a = h2d(ix, iy), b = h2d(ix + 1, iy), c = h2d(ix, iy + 1), d2 = h2d(ix + 1, iy + 1);
+    return a + (b - a) * fx + (c - a) * fy + (a - b - c + d2) * fx * fy;
+  }
+  for (var gy = 0; gy < GH; gy++) for (var gx = 0; gx < GW; gx++) {
+    var X = gx / GW, Y = gy / GH;
+    var f = 0.5 * n2(X * 5 + 3, Y * 3.2 + 9) + 0.27 * n2(X * 11 + 20, Y * 7 + 4) + 0.15 * n2(X * 23, Y * 15 + 31) + 0.08 * n2(X * 47 + 5, Y * 31);
+    // a diagonal lane rising from the hole toward the upper right
+    var dd = (Y - (0.80 - 0.55 * X)) / 0.30;
+    dust[gy * GW + gx] = Math.pow(f, 2.6) * (0.25 + Math.exp(-dd * dd)) * 26;
+  }
+  var full = ctx.getImageData(0, 0, W, H), fp = full.data;
+  for (var yy = 0; yy < H; yy++) {
+    var fy = yy / H * (GH - 1), iy = fy | 0, ty = fy - iy, iy1 = iy + 1 < GH ? iy + 1 : iy;
+    for (var xx = 0; xx < W; xx++) {
+      var fx = xx / W * (GW - 1), ix = fx | 0, tx = fx - ix, ix1 = ix + 1 < GW ? ix + 1 : ix;
+      var v2 = (dust[iy * GW + ix] * (1 - tx) + dust[iy * GW + ix1] * tx) * (1 - ty) +
+               (dust[iy1 * GW + ix] * (1 - tx) + dust[iy1 * GW + ix1] * tx) * ty;
+      var gdx = xx - cx, gdy = yy - cy, warm = Math.exp(-(gdx * gdx + gdy * gdy) / (900 * 900 * S * S / 4));
+      var grain = (rnd() - 0.5) * 3.0, dz = rnd();
+      var q = (yy * W + xx) * 4;
+      fp[q]     = fp[q]     + v2 * (0.80 + 0.5 * warm) + grain + dz;
+      fp[q + 1] = fp[q + 1] + v2 * (0.84 + 0.05 * warm) + grain + dz;
+      fp[q + 2] = fp[q + 2] + v2 * (1.00 - 0.3 * warm) + grain + dz;
+    }
+  }
+  ctx.putImageData(full, 0, 0);
+  document.getElementById('out').textContent = 'sky|' + cv.toDataURL('image/jpeg', 0.93);
+})();
+</script>
+</body></html>
