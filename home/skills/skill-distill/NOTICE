@@ -1,0 +1,53 @@
+skill-distill
+
+Vendored from sybil-solutions/skill-distill
+https://github.com/sybil-solutions/skill-distill
+(skills/skill-distill/* and LICENSE; main branch @ 4c3b307096ae, fetched 2026-11-27)
+
+License: MIT. Copyright (c) 2026 Sybil Solutions.
+The full license text is in LICENSE.
+
+Upstream's README.md is intentionally not vendored: it is install material,
+not part of the skill.
+
+Pre-install review (bouncer agent; SkillSpector v2.11.2 --no-llm plus a full
+manual read of all 11 files; nothing executed). Verdict: CAUTION.
+  - No telemetry, upload, or fetch-and-run. The only network call is a
+    127.0.0.1 poll in capture_web.py, whose server binds 127.0.0.1.
+  - The scanner scores it CRITICAL because the adapters launch auto-approving,
+    unsandboxed agents by design: claude.sh (--dangerously-skip-permissions,
+    global CLAUDE.md / skills / MCP / hooks left on), codex.sh
+    (--dangerously-bypass-approvals-and-sandbox), omp.sh (--auto-approve),
+    opencode.sh (--auto). pi.sh passes --no-skills only.
+  - The student and checks.sh inherit the caller's full environment.
+  - extract_session.py redacts by regex and keeps up to 600 characters of each
+    command and 400 of each tool output, so a secret in the reference session
+    can reach reference.md and then the student's endpoint.
+  - Operator inputs reach a shell: --setup and capture_web.py --start run with
+    shell=True; the model id, --student-args and --env are expanded in run.sh;
+    run paths are unquoted. --name is unvalidated and feeds an rmtree of
+    runs/<task>/final/<name>.
+  - `evidence --reference` runs checks.sh inside the real reference directory.
+  - No hidden Unicode or injected instructions in the markdown.
+
+Usage constraints (the `sensei` agent enforces these; follow them when using
+the skill directly):
+  - Local or self-hosted student endpoint only, unless the user approves a
+    hosted one for that repository.
+  - Do not use the claude adapter with a normal profile: the student would get
+    the user's MCP connectors with permissions skipped.
+  - Start trials from a shell with no credentials in the environment. The
+    workspace copy is not containment.
+  - Keep runs/ outside any git work tree; never commit or publish it, and do
+    not publish report.html.
+  - Review --setup, --env, --student-args, --name and checks.sh before each
+    run; use paths and names without spaces or shell metacharacters.
+
+Changes in this copy:
+  - SKILL.md frontmatter: description wrapped in single quotes (upstream's
+    unquoted colons are invalid YAML). Text unchanged.
+  - SKILL.md step 8: "publish it as a private page if your environment can"
+    replaced with an instruction to open report.html locally.
+  - .gitignore added (runs/, __pycache__/); upstream ignores runs/ at its
+    repository root, which is not vendored.
+  - This NOTICE was added for attribution.
