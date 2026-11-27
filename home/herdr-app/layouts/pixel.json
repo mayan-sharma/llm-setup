@@ -1,0 +1,80 @@
+{
+  "id": "root",
+  "type": "row",
+  "titlebar": "none",
+  "traffic_lights": [18, 18],
+  "preview": "layouts/pixel.svg",
+  "theme": "pixel",
+  "toast": "pixel",
+  "font": "Departure Mono",
+  "font_size": 13,
+  "font_weight": 400,
+  "ui_font": "Departure Mono",
+  "background": { "image": "mods/pixel/art/sky-1.png", "fit": "cover" },
+  "terminal_padding": [14, 18],
+  "terminal_opacity": 0,
+  "resizable": false,
+  "children": [
+    {
+      "id": "sidebar",
+      "type": "block",
+      "size": { "px": 272 },
+      "window_drag": true,
+      "content": { "mod": "pixel", "props": { "role": "rail" } }
+    },
+    {
+      "id": "work",
+      "type": "column",
+      "resizable": false,
+      "children": [
+        {
+          "id": "pixel-strip",
+          "type": "block",
+          "size": { "px": 44 },
+          "window_drag": true,
+          "content": { "mod": "pixel", "props": { "role": "strip" } }
+        },
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "gap": 6,
+              "radius": 0,
+              "background": "#0d0e18eb",
+              "lone": true,
+              "border": { "width": 2, "color": "#00000000" },
+              "focus": { "width": 2, "color": "#00000000" },
+              "header": {
+                "content": { "mod": "pixel", "props": { "role": "pane" } },
+                "height": 34,
+                "position": "top",
+                "reveal": "always"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "pixel-side",
+      "type": "column",
+      "hidden": true,
+      "size": { "px": 300 },
+      "min": 240,
+      "max": 480,
+      "background": "#0d0e18eb",
+      "resizable": false,
+      "children": [
+        {
+          "id": "pixel-side-tabs",
+          "type": "block",
+          "size": { "px": 44 },
+          "content": { "mod": "pixel", "props": { "role": "sidetabs" } }
+        },
+        { "id": "pixel-side-page", "type": "block", "content": { "mod": "pixel", "props": { "role": "side" } } }
+      ]
+    }
+  ]
+}
