@@ -1,0 +1,27 @@
+home/agents/sensei.md
+  a8cb887bf9411cc3 1-98
+home/skills/skill-distill/SKILL.md
+  a8cb887bf9411cc3 182
+home/skills/skill-distill/NOTICE
+  a8cb887bf9411cc3 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "21a95e0e04493a24f85e12174ce9f654641720f5",
+  "prompts": {
+    "a8cb887bf9411cc3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "212b25ed-51cb-45c4-8cdc-489ff506c43a",
+        "model": "claude-fable-5-2"
+      },
+      "human_author": "mayan.sharma@1mg.com",
+      "messages": [],
+      "total_additions": 153,
+      "total_deletions": 2,
+      "accepted_lines": 152,
+      "overriden_lines": 0
+    }
+  }
+}
