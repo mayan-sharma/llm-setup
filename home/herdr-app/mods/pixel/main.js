@@ -1,5 +1,6 @@
 // Pixel: a 16-colour night camp. Everything sits on a 2px grid and is set in
-// Departure Mono; the sky (art/make.mjs) is the layout's background image.
+// Departure Mono; the sky (art/make.mjs) is the layout's background image, and
+// the rail paints its own copy of the dusk, without the stars.
 // The layout gives each copy props { role }:
 //   rail   every space with its tabs, then the camp: moon, tent, the herder and
 //          the fire, with Claude's usage as gauges in the ground beneath it
@@ -164,6 +165,35 @@ const STARS = [
   [0.42, 48, 2, C.slate, 4100],
 ];
 
+// Faint stars that hold still, in the camp's own sky: under the camp art, so the
+// pines and the moon cover them. across (0..1), down (px), colour.
+const DUST = [
+  [0.04, 74, C.navy],
+  [0.21, 10, C.slate],
+  [0.37, 38, C.navy],
+  [0.47, 16, C.fog],
+  [0.57, 60, C.slate],
+  [0.7, 6, C.navy],
+  [0.77, 64, C.navy],
+  [0.86, 52, C.slate],
+  [0.98, 30, C.slate],
+  [0.27, 70, C.navy],
+];
+
+// The sky's dusk ramp (art/make.mjs) as flat bands, rail height for window height.
+// The rail paints its own sky so the layout background's stars never sit behind
+// the list: on a tall window the cover crop puts the sky's starry middle there.
+const RAMP = ["#0d0e18", "#11121e", "#151726", "#1a1c2c", "#1f2238", "#252947", "#2c2d56", "#382c5e", "#482b60", "#5d275d"];
+function dusk() {
+  // band i is where the dithered ramp rounds to i; each runs to the foot, the next over it, so no seam opens
+  return div()
+    .absolute()
+    .left(0)
+    .top(0)
+    .size_full()
+    .children(RAMP.map((colour, i) => div().absolute().left(0).right(0).bottom(0).top(i ? `${(Math.pow((i - 0.5) / 9, 1 / 2.1) * 100).toFixed(2)}%` : 0).bg(colour)));
+}
+
 // A spark is one block of text. Each frame lifts it a line; empty frames are the wait.
 function sparkFrames(rise, drift, wait) {
   const list = [];
@@ -210,6 +240,7 @@ class Rail {
       .flex_none()
       .w_full()
       .h(height)
+      .children(DUST.map(([x, y, colour]) => div().absolute().left(Math.round(x * width)).top(y).w(2).h(2).bg(colour)))
       .children(STARS.map(([x, y, size, colour, period]) => div().absolute().left(Math.round(x * width)).top(y).w(size).h(size).bg(colour).loop("opacity", { from: 0.1, to: 1, period })))
       .child(div().absolute().left(0).top(0).w(width).h(height).child(image(CAMP.file).w(width).h(height)))
       // the flames: red at the edges, orange, yellow at the heart
@@ -339,6 +370,7 @@ class Rail {
         this.width = size.width;
         cx.notify();
       })
+      .child(dusk())
       .child(div().absolute().top(0).right(0).w(2).h_full().bg("#333c5770"))
       .child(
         h_flex()
